@@ -1,0 +1,533 @@
+{
+  "casas": [
+    {
+      "id": "c0",
+      "nombre": "Fam. Cabezas",
+      "dir": "Los Narcisos 1171",
+      "terr": "13",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c1",
+      "nombre": "Fam. Da Silva",
+      "dir": "Las Granadas 1713",
+      "terr": "19",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c2",
+      "nombre": "Fam. Meneses",
+      "dir": "José Gil de Castro Sur 41",
+      "terr": "3",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c3",
+      "nombre": "Rita Panes",
+      "dir": "Las Laurentinas 869",
+      "terr": "4",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c4",
+      "nombre": "Fam. Cruz",
+      "dir": "José Gil de Castro Sur 63",
+      "terr": "2",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c5",
+      "nombre": "Fam. Alvarado",
+      "dir": "Los Magnolios 370",
+      "terr": "9",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c6",
+      "nombre": "Fam. Valladares",
+      "dir": "Las Meliás 1431",
+      "terr": "5",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c7",
+      "nombre": "Fam. Coronado",
+      "dir": "Pasaje Canelo 43",
+      "terr": "15",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c8",
+      "nombre": "Fam. Pérez",
+      "dir": "José Gandarilla 297",
+      "terr": "3",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c9",
+      "nombre": "Fam. Benavides",
+      "dir": "El Laurel 40",
+      "terr": "7",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c10",
+      "nombre": "Fam. Orellana",
+      "dir": "Lomas de la Luz 1263",
+      "terr": "23",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c11",
+      "nombre": "Fam. Colina",
+      "dir": "Los Abetos 142",
+      "terr": "11",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "c12",
+      "nombre": "Fam. Robles",
+      "dir": "Los Ulmos 742",
+      "terr": "22",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    }
+  ],
+  "hermanos": [
+    {
+      "id": "h0",
+      "nombre": "Luis Cabeza",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h1",
+      "nombre": "Cristian Da Silva",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h2",
+      "nombre": "Ronny Pérez",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h3",
+      "nombre": "Hernán Coronado",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h4",
+      "nombre": "Felipe González",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h5",
+      "nombre": "David Cruz",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h6",
+      "nombre": "Yimmy Silva",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h7",
+      "nombre": "Luis López",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h8",
+      "nombre": "Manuel Hernández",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h9",
+      "nombre": "Carlos Alvarado",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h10",
+      "nombre": "Matías Colina",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h11",
+      "nombre": "Ismael Orellana",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h12",
+      "nombre": "Claudio Correa",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h13",
+      "nombre": "Jhony Silva",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h14",
+      "nombre": "Guillermo Colina",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h15",
+      "nombre": "Ricardo Ugalde",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h16",
+      "nombre": "Felipe Godoy",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h17",
+      "nombre": "Jorge Benavides",
+      "dir": "",
+      "terr": "",
+      "turno": "MT",
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    }
+  ]
+}

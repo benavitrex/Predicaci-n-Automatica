@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8"><title>Casas y hermanos</title></head><body>
+<main>
+<div class=noprint style="display:flex;gap:8px;align-items:center"><button id=saveBtn class=pri disabled>Guardar en GitHub</button><small id=dirty></small></div>
+
+<h2>Casas</h2>
+<section class=box><form id=fc>
+ <input name=nombre placeholder="Familia (ej. Fam. Cabezas)" required>
+ <input name=dir placeholder="Dirección" required>
+ <input name=terr placeholder="Territorio" size=8>
+ <select name=turno><option value=MT>Mañana y tarde</option><option value=M>Mañana</option><option value=T>Tarde</option></select>
+ <span id=fcd></span><button class=pri>Añadir casa</button>
+</form></section>
+<div id=lc></div>
+
+<h2>Hermanos</h2>
+<section class=box><form id=fh>
+ <input name=nombre placeholder="Nombre" required>
+ <select name=turno><option value=MT>Mañana y tarde</option><option value=M>Mañana</option><option value=T>Tarde</option></select>
+ <span id=fhd></span><button class=pri>Añadir hermano</button>
+</form></section>
+<div id=lh></div>
+</main>
+<script src="app.js"></script>
+<script>
+shell('i');
+const uid=()=>Math.random().toString(36).slice(2,9);
+const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=${n} value=${d} ${d>0?'checked':''}>${DIAS[d].slice(0,3)}</label>`).join('');
+$('#fcd').innerHTML=boxes('d');$('#fhd').innerHTML=boxes('d');
+const TN={MT:'Mañana y tarde',M:'Mañana',T:'Tarde'};
+
+function item(k,x){
+ return `<div class=item data-k=${k} data-id=${x.id}><div><b>${esc(x.nombre)}</b> <small>${esc(x.dir||'')}${x.terr?' · Terr. '+esc(x.terr):''}</small></div>
+ <div>${ORDEN.map(d=>`<span class="chip ${x.dias.includes(d)?'on':''}" data-d=${d}>${DIAS[d].slice(0,2)}</span>`).join('')}</div>
+ <select data-t>${Object.keys(TN).map(t=>`<option value=${t} ${x.turno==t?'selected':''}>${TN[t]}</option>`).join('')}</select>
+ <label class=chk><input type=checkbox data-a ${x.activa!==false?'checked':''}>Disponible</label><button data-del title="Eliminar">✕</button></div>`;
+}
+function render(){
+ $('#lc').innerHTML=DB.casas.map(x=>item('casas',x)).join('')||'<small>Aún no hay casas. Añade la primera arriba.</small>';
+ $('#lh').innerHTML=DB.hermanos.map(x=>item('hermanos',x)).join('')||'<small>Aún no hay hermanos.</small>';
+}
+function dirty(){$('#saveBtn').disabled=false;$('#dirty').textContent='Cambios sin guardar';}
+function add(e,k){
+ e.preventDefault();const f=new FormData(e.target);
+ DB[k].push({id:uid(),nombre:f.get('nombre'),dir:f.get('dir')||'',terr:f.get('terr')||'',turno:f.get('turno'),dias:f.getAll('d').map(Number),activa:true});
+ e.target.reset();render();dirty();
+}
+$('#fc').onsubmit=e=>add(e,'casas');$('#fh').onsubmit=e=>add(e,'hermanos');
+const find=el=>{const it=el.closest('.item');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id),it];};
+document.addEventListener('click',e=>{
+ const r=find(e.target);if(!r)return;const [arr,x]=r;
+ if(e.target.dataset.d!==undefined){const d=+e.target.dataset.d;x.dias=x.dias.includes(d)?x.dias.filter(v=>v!=d):[...x.dias,d];render();dirty();}
+ if(e.target.dataset.del!==undefined&&confirm('¿Eliminar '+x.nombre+'?')){arr.splice(arr.indexOf(x),1);render();dirty();}
+});
+document.addEventListener('change',e=>{
+ const r=find(e.target);if(!r)return;const x=r[1];
+ if('t' in e.target.dataset)x.turno=e.target.value;if('a' in e.target.dataset)x.activa=e.target.checked;dirty();
+});
+$('#saveBtn').onclick=async()=>{try{await save();$('#saveBtn').disabled=true;$('#dirty').textContent='';toast('Guardado en GitHub');}catch(e){toast('Error: '+e.message);}};
+load().then(render);
+</script></body></html>
