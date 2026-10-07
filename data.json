@@ -224,283 +224,92 @@
   ],
   "hermanos": [
     {
-      "id": "h0",
-      "nombre": "Luis Cabeza",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h1",
-      "nombre": "Cristian Da Silva",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h2",
-      "nombre": "Ronny Pérez",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h3",
-      "nombre": "Hernán Coronado",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h4",
-      "nombre": "Felipe González",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
       "id": "h5",
-      "nombre": "David Cruz",
-      "dir": "",
-      "terr": "",
+      "nombre": "Mauro Silva",
+      "tarea": "PTJ",
+      "gr": "1",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
+      "grupo": false,
+      "dias": [],
+      "activa": false
     },
     {
       "id": "h6",
-      "nombre": "Yimmy Silva",
-      "dir": "",
-      "terr": "",
+      "nombre": "Osvaldo Díaz",
+      "tarea": "PTJ",
+      "gr": "2",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h7",
-      "nombre": "Luis López",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h8",
-      "nombre": "Manuel Hernández",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
+      "grupo": false,
+      "dias": [],
+      "activa": false
     },
     {
       "id": "h9",
-      "nombre": "Carlos Alvarado",
-      "dir": "",
-      "terr": "",
+      "nombre": "Tomás Coronado",
+      "tarea": "PTJ",
+      "gr": "3",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h10",
-      "nombre": "Matías Colina",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
+      "grupo": false,
+      "dias": [],
       "activa": true
     },
     {
       "id": "h11",
-      "nombre": "Ismael Orellana",
-      "dir": "",
-      "terr": "",
+      "nombre": "Hugo Gutiérrez",
+      "tarea": "PTJ",
+      "gr": "3",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h12",
-      "nombre": "Claudio Correa",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
-    },
-    {
-      "id": "h13",
-      "nombre": "Jhony Silva",
-      "dir": "",
-      "terr": "",
-      "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
+      "grupo": false,
+      "dias": [],
+      "activa": false
     },
     {
       "id": "h14",
-      "nombre": "Guillermo Colina",
-      "dir": "",
-      "terr": "",
+      "nombre": "Juan Navarro",
+      "tarea": "PTJ",
+      "gr": "2",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
+      "grupo": false,
+      "dias": [],
       "activa": true
     },
     {
       "id": "h15",
-      "nombre": "Ricardo Ugalde",
-      "dir": "",
-      "terr": "",
+      "nombre": "Mateo Valencia",
+      "tarea": "PTJ",
+      "gr": "4",
       "turno": "MT",
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
-      "activa": true
+      "grupo": false,
+      "dias": [],
+      "activa": false
     },
     {
       "id": "h16",
-      "nombre": "Felipe Godoy",
-      "dir": "",
-      "terr": "",
+      "nombre": "Javier Valenzuela",
+      "tarea": "PTJ",
+      "gr": "4",
       "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": false
+    },
+    {
+      "id": "h18",
+      "nombre": "Eduardo Benavides",
+      "tarea": "PTJ",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h20",
+      "nombre": "Juan Aguilera",
+      "tarea": "AN/PR",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": true,
       "dias": [
         1,
         2,
@@ -513,11 +322,492 @@
       "activa": true
     },
     {
-      "id": "h17",
+      "id": "h23",
       "nombre": "Jorge Benavides",
-      "dir": "",
-      "terr": "",
+      "tarea": "AN",
+      "gr": "3",
       "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h24",
+      "nombre": "Luis Cabezas",
+      "tarea": "PTJ",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h36",
+      "nombre": "Rodrigo Molina",
+      "tarea": "PTJ",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h43",
+      "nombre": "Ismael Orellana",
+      "tarea": "SM/PR",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h46",
+      "nombre": "David Ortega",
+      "tarea": "PTJ",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h47",
+      "nombre": "Mario Aliaga",
+      "tarea": "AN",
+      "gr": "2",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h48",
+      "nombre": "Carlos Alvarado",
+      "tarea": "PTJ",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h49",
+      "nombre": "David Cruz",
+      "tarea": "SM/PR",
+      "gr": "2",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h54",
+      "nombre": "Hernán Coronado",
+      "tarea": "AN",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h55",
+      "nombre": "Luis Valladares",
+      "tarea": "PTJ",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h60",
+      "nombre": "Claudio Correa",
+      "tarea": "AN/PE",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h61",
+      "nombre": "Miguel Meneses",
+      "tarea": "SM",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h63",
+      "nombre": "Johnny Silva",
+      "tarea": "SM",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h65",
+      "nombre": "Ricardo Ugalde",
+      "tarea": "SM",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h68",
+      "nombre": "Gabriel Ugalde",
+      "tarea": "PTJ",
+      "gr": "3",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h71",
+      "nombre": "Manuel Hernández",
+      "tarea": "AN",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h74",
+      "nombre": "Felipe Godoy",
+      "tarea": "SM",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h76",
+      "nombre": "Luis López",
+      "tarea": "AN",
+      "gr": "2",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h77",
+      "nombre": "Enrique Núñez",
+      "tarea": "PTJ",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h81",
+      "nombre": "Ronny Pérez",
+      "tarea": "AN/PR",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h86",
+      "nombre": "Guillermo Colina",
+      "tarea": "SM",
+      "gr": "2",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h88",
+      "nombre": "Cristian Da Silva",
+      "tarea": "AN/PR",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h90",
+      "nombre": "Luis Escandell",
+      "tarea": "AN",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h91",
+      "nombre": "Felipe Escandell",
+      "tarea": "PTJ",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h92",
+      "nombre": "Agustín Pizarro",
+      "tarea": "PTJ",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h95",
+      "nombre": "Cesar Robles",
+      "tarea": "PTJ",
+      "gr": "1",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h98",
+      "nombre": "Andrés Valenzuela",
+      "tarea": "PTJ",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h99",
+      "nombre": "Mauricio Valenzuela",
+      "tarea": "SM",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h103",
+      "nombre": "Carlos Yáñez",
+      "tarea": "PTJ",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h105",
+      "nombre": "Felipe Gonzalez",
+      "tarea": "AN/PR",
+      "gr": "4",
+      "turno": "MT",
+      "grupo": true,
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h107",
+      "nombre": "Jhon Maturana",
+      "tarea": "PTJ",
+      "gr": "5",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h108",
+      "nombre": "Alejandro Oliva",
+      "tarea": "SC",
+      "gr": "",
+      "turno": "MT",
+      "grupo": false,
+      "dias": [],
+      "activa": true
+    },
+    {
+      "id": "h114",
+      "nombre": "Carlos Picardo",
+      "tarea": "SM/PR",
+      "gr": "",
+      "turno": "MT",
+      "grupo": true,
       "dias": [
         1,
         2,

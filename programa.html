@@ -32,7 +32,7 @@ function gen(){
    const t=hora<'14:00'?'M':'T',cUsed=new Set();
    for(let g=1;g<=n;g++){
     const c=pick(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!cUsed.has(x.id)),uC,lC);
-    const h=pick(DB.hermanos.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!hUsed.has(x.id)),uH,lH);
+    const h=pick(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!hUsed.has(x.id)),uH,lH);
     if(c){cUsed.add(c.id);uC[c.id]=(uC[c.id]||0)+1;lC[c.id]=i;}
     if(h){hUsed.add(h.id);uH[h.id]=(uH[h.id]||0)+1;lH[h.id]=i;}
     ROWS.push({date,hora,g:n>1?g:0,c:c?.id,h:h?.id});
@@ -47,7 +47,7 @@ function render(){
  $('#tb').innerHTML=ROWS.map((r,k)=>{
   const c=DB.casas.find(x=>x.id==r.c);
   return `<tr data-k=${k}><td>${fmt(r.date)}</td><td>${r.hora}${r.g?' <small>Grupo '+r.g+'</small>':''}</td>
-  <td><select data-s=h>${opts(DB.hermanos,r.h)}</select></td>
+  <td><select data-s=h>${opts(DB.hermanos.filter(x=>x.grupo),r.h)}</select></td>
   <td><select data-s=c>${opts(DB.casas,r.c)}</select>${c?`<small>${esc(c.dir)}</small>`:'<small class=warn>Sin casa disponible</small>'}</td>
   <td>${esc(c?.terr||'')}</td></tr>`;}).join('');
 }
