@@ -5,6 +5,11 @@
       "nombre": "Fam. Cabezas",
       "dir": "Los Narcisos 1171",
       "terr": "13",
+      "cerca": [
+        13,
+        12,
+        15
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -22,6 +27,11 @@
       "nombre": "Fam. Da Silva",
       "dir": "Las Granadas 1713",
       "terr": "19",
+      "cerca": [
+        19,
+        18,
+        20
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -39,6 +49,12 @@
       "nombre": "Fam. Meneses",
       "dir": "José Gil de Castro Sur 41",
       "terr": "3",
+      "cerca": [
+        3,
+        4,
+        5,
+        6
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -56,6 +72,11 @@
       "nombre": "Rita Panes",
       "dir": "Las Laurentinas 869",
       "terr": "4",
+      "cerca": [
+        4,
+        5,
+        16
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -73,6 +94,10 @@
       "nombre": "Fam. Cruz",
       "dir": "José Gil de Castro Sur 63",
       "terr": "2",
+      "cerca": [
+        2,
+        3
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -90,6 +115,11 @@
       "nombre": "Fam. Alvarado",
       "dir": "Los Magnolios 370",
       "terr": "9",
+      "cerca": [
+        9,
+        10,
+        8
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -107,6 +137,12 @@
       "nombre": "Fam. Valladares",
       "dir": "Las Meliás 1431",
       "terr": "5",
+      "cerca": [
+        5,
+        6,
+        4,
+        21
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -124,6 +160,10 @@
       "nombre": "Fam. Coronado",
       "dir": "Pasaje Canelo 43",
       "terr": "15",
+      "cerca": [
+        14,
+        15
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -141,6 +181,10 @@
       "nombre": "Fam. Pérez",
       "dir": "José Gandarilla 297",
       "terr": "3",
+      "cerca": [
+        3,
+        2
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -158,6 +202,12 @@
       "nombre": "Fam. Benavides",
       "dir": "El Laurel 40",
       "terr": "7",
+      "cerca": [
+        7,
+        8,
+        9,
+        10
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -175,6 +225,11 @@
       "nombre": "Fam. Orellana",
       "dir": "Lomas de la Luz 1263",
       "terr": "23",
+      "cerca": [
+        23,
+        21,
+        20
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -192,6 +247,10 @@
       "nombre": "Fam. Colina",
       "dir": "Los Abetos 142",
       "terr": "11",
+      "cerca": [
+        11,
+        10
+      ],
       "turno": "MT",
       "dias": [
         1,
@@ -209,6 +268,11 @@
       "nombre": "Fam. Robles",
       "dir": "Los Ulmos 742",
       "terr": "22",
+      "cerca": [
+        22,
+        21,
+        1
+      ],
       "turno": "MT",
       "dias": [
         1,

@@ -36,9 +36,9 @@ async function save(msg='Actualiza casas y hermanos'){
 
 function shell(active){
   document.head.insertAdjacentHTML('beforeend',`<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=theme-color content="#101412"><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=Curauma><style>
-:root{--bg:#f3f5f3;--fg:#17201b;--mut:#66726b;--ac:#1f7a56;--ac2:#145a3f;--on:#fff;--ln:#dfe5e1;--card:#fff;--bad:#c0392b;--sh:0 1px 3px rgba(16,20,18,.08),0 4px 14px rgba(16,20,18,.06);--font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#101412;--fg:#e8eeea;--mut:#8f9d95;--ac:#4fc08d;--ac2:#0b0f0d;--on:#0b0f0d;--ln:#26302a;--card:#171d1a;--bad:#ff8a80;--sh:0 1px 3px rgba(0,0,0,.4)}}
-:root[data-theme=dark]{--bg:#101412;--fg:#e8eeea;--mut:#8f9d95;--ac:#4fc08d;--ac2:#0b0f0d;--on:#0b0f0d;--ln:#26302a;--card:#171d1a;--bad:#ff8a80;--sh:0 1px 3px rgba(0,0,0,.4)}
+:root{--bg:#F4F6F9;--fg:#2C3E50;--mut:#6B7C8F;--ac:#2B4C7E;--ac2:#1A2B4C;--on:#fff;--ln:#E1E8ED;--card:#fff;--bad:#B81D1D;--sh:0 2px 8px rgba(0,0,0,.05);--font:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;--man:#C07D00;--man2:#D9822B;--tar:#680000;--tar2:#8B0000;--vc:#981414;--vc2:#B81D1D}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0F1626;--fg:#E0E6ED;--mut:#93A3B8;--ac:#7FA6E0;--ac2:#0B1220;--on:#0F1626;--ln:#2A3856;--card:#17223A;--bad:#FF8A80;--sh:0 2px 8px rgba(0,0,0,.35)}}
+:root[data-theme=dark]{--bg:#0F1626;--fg:#E0E6ED;--mut:#93A3B8;--ac:#7FA6E0;--ac2:#0B1220;--on:#0F1626;--ln:#2A3856;--card:#17223A;--bad:#FF8A80;--sh:0 2px 8px rgba(0,0,0,.35)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font)}
 .skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;z-index:20;background:var(--card);padding:6px 12px;border-radius:8px}
 header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--ln);padding-top:env(safe-area-inset-top)}
@@ -89,6 +89,59 @@ input[type=search]{width:100%;margin:4px 0 8px;font-size:15px}
 .dd{min-width:34px;font-size:14px;padding:6px 0;opacity:1;border-style:dashed;background:transparent}.dd.on{border-style:solid;background:var(--rc);border-color:var(--rc);color:#fff}
 .tg{font-size:13px;padding:3px 11px;opacity:1;border-style:dashed}.tg.on{border-style:solid;background:color-mix(in srgb,var(--rc) 16%,transparent);border-color:var(--rc);color:color-mix(in srgb,var(--rc) 65%,var(--fg))}
 [hidden]{display:none!important}
+/* ===== Tipografía y jerarquía ===== */
+body{font-family:var(--font);font-weight:400;color:var(--fg)}
+h1,h2,h3,.eyebrow,th{font-weight:700}
+h2{color:#1A2B4C;font-size:19px}
+:root[data-theme=dark] h2{color:var(--fg)}
+.eyebrow{color:#2B4C7E;letter-spacing:.1em}
+b,td.day,.cc b,.vh b{font-weight:600}
+/* ===== Header ===== */
+header.top{background:#1A2B4C;border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.brand{color:#fff}.logo{background:#fff;color:#1A2B4C}
+header.top nav a{color:#E0E6ED}
+header.top nav a:hover{background:rgba(255,255,255,.1);color:#fff}
+header.top nav a.on{background:rgba(255,255,255,.16);color:#fff}
+.th{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+/* ===== Tarjetas, botones, chips ===== */
+.card{border:1px solid var(--ln);box-shadow:var(--sh)}
+button.pri{background:#2B4C7E;border-color:#2B4C7E;color:#fff}
+button.pri:hover{background:#1A2B4C}
+.chip.on{background:#2B4C7E;border-color:#2B4C7E;color:#fff}
+.mh{border-top-color:#1A2B4C}.mh h2{color:#1A2B4C;font-weight:700}
+:root[data-theme=dark] .mh h2{color:var(--fg)}
+/* ===== Programa: tabla ===== */
+.wh h2{color:#1A2B4C;font-size:20px}.wh h2 small{font-weight:400}
+:root[data-theme=dark] .wh h2{color:var(--fg)}
+table{border:1px solid var(--ln);box-shadow:none}
+th{background:#1A2B4C;color:#fff;font-size:12px;letter-spacing:.07em;border-color:#1A2B4C;padding:9px 8px}
+td{padding:9px 8px;border-color:var(--ln)}
+td.day{color:#1A2B4C;font-weight:600;letter-spacing:.02em}
+:root[data-theme=dark] td.day{color:var(--fg)}
+td input{font-weight:600;border-color:transparent;background:transparent}
+td input:hover,td input:focus{border-color:var(--ln);background:var(--card)}
+.hint{font-size:12px;margin-top:2px}
+/* Mañana (ámbar) / Tarde (burdeos) */
+tr.am td.day{border-left:5px solid #D9822B}
+tr.pm td.day{border-left:5px solid #8B0000}
+tr.am td.hr:nth-child(2) input{color:#C07D00}
+tr.pm td.hr:nth-child(2) input{color:#680000}
+:root[data-theme=dark] tr.am td.hr:nth-child(2) input{color:#F0B04A}
+:root[data-theme=dark] tr.pm td.hr:nth-child(2) input{color:#FF8A80}
+tr.pm td{background:color-mix(in srgb,#8B0000 4%,var(--card))}
+td.hr:nth-child(2) input{font-size:16px;font-weight:700}
+td.hr:nth-child(5) input{color:#fff;background:#2B4C7E;border-radius:12px;text-align:center;font-weight:700;width:auto;min-width:56px}
+.hg b{color:#1A2B4C}
+:root[data-theme=dark] .hg b{color:var(--fg)}
+#hor input[data-h]{font-weight:600}
+@media print{
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .ph{background:#1A2B4C;color:#fff;padding:10px;border-radius:6px;font-size:15px;letter-spacing:.03em}
+ th{background:#1A2B4C!important;color:#fff!important}
+ td.hr:nth-child(5) input{background:#2B4C7E!important;color:#fff!important}
+ td{padding:7px 8px}
+ body{color:#000}
+}
 @media print{header.top,.skip,.noprint,#msg{display:none!important}body{background:#fff;color:#000}td select{border:0;background:none;appearance:none;color:#000;padding:0}}
 </style>`);
   document.body.insertAdjacentHTML('afterbegin',`<a class=skip href="#main">Ir al contenido</a><header class=top><div class=in><a class=brand href="index.html"><span class=logo>CC</span><span>Congregación Curauma</span></a><div class=rt><nav><a href="index.html" class="${active=='i'?'on':''}">Inicio</a><a href="programa.html" class="${active=='p'?'on':''}">Programa</a></nav><button id=thBtn class=th title="Modo claro / oscuro" aria-label="Modo claro / oscuro">◐</button></div></div><button id=cfgBtn hidden aria-hidden=true tabindex=-1></button></header>
