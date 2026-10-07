@@ -77,6 +77,17 @@ dialog{border:1px solid var(--ln);border-radius:14px;background:var(--card);colo
 .dd{min-width:32px;text-align:center;padding:5px 0;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--ln);color:var(--mut);opacity:.45}.dd.on{background:var(--ac);color:var(--on);border-color:var(--ac);opacity:1}.dd.sel{outline:2px solid var(--fg);outline-offset:1px}
 .tg{font-size:12px;padding:2px 9px;border-radius:10px;border:1px solid var(--ln);color:var(--mut);opacity:.5}.tg.on{opacity:1;color:var(--ac);border-color:var(--ac);font-weight:600}
 .mh{border-top:4px solid var(--ac);padding-top:10px;margin:22px 0 10px}.mh h2{font-size:26px;margin:0}.mh h2,.arch b{text-transform:capitalize}
+input[type=search]{width:100%;margin:4px 0 8px;font-size:15px}
+.frow{display:flex;gap:8px;align-items:flex-start;margin:6px 0}.frow .fl{margin:0}.fl-l{flex:0 0 54px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);padding-top:6px}
+.chip{font-size:14px;padding:5px 12px}.cg{grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:12px}
+.cc,.vc{--rc:var(--ac);border-left:5px solid var(--rc);background:var(--card);box-shadow:var(--sh);padding:14px 16px;gap:10px}
+.cc b,.vh b{font-size:17px;font-weight:700;line-height:1.25}.ad{font-size:14px;color:var(--fg);opacity:.8}
+.tag.acc{font-size:13px;padding:3px 12px;border-radius:12px}
+.vc.r-AN{--rc:#2563eb}.vc.r-SM{--rc:#d97706}.vc.r-PRE{--rc:#7c3aed}.vc.r-PUB{--rc:#64748b}
+.tag.rg{background:color-mix(in srgb,var(--rc) 16%,transparent);color:color-mix(in srgb,var(--rc) 65%,var(--fg));border:0;font-weight:700;font-size:12.5px;padding:3px 10px}
+.lb{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:4px}
+.dd{min-width:34px;font-size:14px;padding:6px 0;opacity:1;border-style:dashed;background:transparent}.dd.on{border-style:solid;background:var(--rc);border-color:var(--rc);color:#fff}
+.tg{font-size:13px;padding:3px 11px;opacity:1;border-style:dashed}.tg.on{border-style:solid;background:color-mix(in srgb,var(--rc) 16%,transparent);border-color:var(--rc);color:color-mix(in srgb,var(--rc) 65%,var(--fg))}
 [hidden]{display:none!important}
 @media print{header.top,.skip,.noprint,#msg{display:none!important}body{background:#fff;color:#000}td select{border:0;background:none;appearance:none;color:#000;padding:0}}
 </style>`);
