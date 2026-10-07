@@ -16,6 +16,11 @@ dialog.wide{width:min(560px,calc(100% - 32px));max-height:90vh;overflow:auto}
 .pgbar .pg-mid{display:flex;align-items:center;gap:10px;margin-left:auto}
 .pgbar .pg-info{font-size:12.5px;color:var(--soft)}
 .pgbar .arr{padding:5px 12px;font-size:16px;line-height:1}
+.gtag{display:inline-flex;align-items:center;gap:5px;font:600 10.5px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.gtag::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--brand);opacity:.7}
+.gtag.none::before{background:var(--line);opacity:1}
+.cc .gtag{margin-top:2px}
+.vm .vf .gtag{margin-left:auto}
 </style></head><body>
 <iframe class="map" title="Mapa de territorios" loading="lazy" allowfullscreen
  src="https://www.google.com/maps/d/embed?mid=1H8j2hSNLHMMxyiIiBI___XOZpPDxobc&ll=-33.1185198147293%2C-71.5801330577226&z=16"></iframe>
@@ -32,7 +37,8 @@ dialog.wide{width:min(560px,calc(100% - 32px));max-height:90vh;overflow:auto}
   <p class="sub">Quién puede sacar grupo, según rango, día y turno. En verde, los días en que puede salir.</p>
   <input id="q2" type="search" placeholder="Buscar hermano…" aria-label="Buscar hermano">
   <div class="vbar">
-  <div class="frow"><span class="fl-l">Grupo</span><div class="fl" id="fvg"></div></div>
+  <div class="frow"><span class="fl-l">Grupo</span><div class="fl" id="fvgr"></div></div>
+  <div class="frow"><span class="fl-l">Salidas</span><div class="fl" id="fvg"></div></div>
   <div class="frow"><span class="fl-l">Rango</span><div class="fl" id="fvr"></div></div>
   <div class="frow"><span class="fl-l">Día</span><div class="fl" id="fvd"></div></div>
   <div class="frow"><span class="fl-l">Turno</span><div class="fl" id="fvt"></div></div>
@@ -76,7 +82,7 @@ dialog.wide{width:min(560px,calc(100% - 32px));max-height:90vh;overflow:auto}
 <script src="app.js"></script>
 <script>
 shell('i');
-let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
+let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',fgr='',q1='',q2='';
 const ES={hermanos:{q:'',f:'si',size:10,page:1},casas:{q:'',f:'',size:10,page:1}};
 const ORD={AN:0,SM:1,PRE:2,PUB:3};
 /* Paginación de las listas públicas (casas / varones) */
@@ -98,6 +104,7 @@ function ccard(x){
  const otros=[...new Set((x.cerca||[]).map(String))].filter(t=>t!==String(x.terr));
  return `<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span>
   <span class="tag acc">Territorio ${esc(x.terr||'—')}</span>
+  <span class="gtag ${x.gr?'':'none'}">${x.gr?'Grupo '+esc(x.gr):'Sin grupo'}</span>
   ${otros.length?`<div class=alt><span class=lb>También con</span>${otros.map(t=>`<span class=tag>Terr. ${esc(t)}</span>`).join('')}</div>`:''}
   <div><span class=lb>Semana · días disponibles</span><div class=wkd role=group aria-label="Días disponibles de ${esc(x.nombre)}">${weekStrip(x.dias||[],fd)}</div></div>
   ${turnoBadges(x.turno)}${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`;
@@ -119,19 +126,21 @@ function vcard(x){
  return `<article class=vm><div class=vt><b class=vn>${esc(x.nombre)}</b><span class="bd rk-${r}">${rango(x.tarea)}</span></div>
   <div><span class=lb>Semana · días disponibles</span><div class=wkd role=group aria-label="Días disponibles de ${esc(x.nombre)}">${strip}</div><div class=wsum>${sum}</div></div>
   <div class=vf>${turnoBadges(x.turno)}
-  <span class="lg ${x.grupo?'si':'no'}">${x.grupo?'✓ Saca grupo: Sí':'✕ Saca grupo: No'}</span></div></article>`;
+  <span class="lg ${x.grupo?'si':'no'}">${x.grupo?'✓ Saca grupo: Sí':'✕ Saca grupo: No'}</span>
+  <span class="gtag ${x.gr?'':'none'}">${x.gr?'Grupo '+esc(x.gr):'Sin grupo'}</span></div></article>`;
 }
 function cards(){
  const D=[['-1','Todos']].concat(ORDEN.map(d=>[String(d),DIAS[d].slice(0,3)]));
  $('#fcd').innerHTML=chips(D,fd,'fd');$('#fvd').innerHTML=chips(D,fv,'fv');
  $('#fct').innerHTML=chips(TURNOS,ft,'ft');$('#fvt').innerHTML=chips(TURNOS,fvt,'fvt');
  $('#fvg').innerHTML=chips([['','Todos'],['si','Saca grupo']],fgp,'fg');
+ $('#fvgr').innerHTML=chips([['','Todos'],['1','Grupo 1'],['2','Grupo 2'],['3','Grupo 3'],['4','Grupo 4'],['5','Grupo 5'],['0','Sin grupo']],fgr,'fgr');
  $('#fvr').innerHTML=chips([['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']],fr,'fr');
  const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase();
  const C=DB.casas.filter(x=>(EM||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
- const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ORD[rk(a).main]-ORD[rk(b).main]||a.nombre.localeCompare(b.nombre));
+ const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(fgr===''||(fgr=='0'?!x.gr:String(x.gr)==fgr))&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ORD[rk(a).main]-ORD[rk(b).main]||a.nombre.localeCompare(b.nombre));
  $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
- const PC=paginate('casas',C,[fd,ft,n1,EM].join('|')),PV=paginate('varones',V,[fv,fvt,fr,fgp,n2].join('|'));
+ const PC=paginate('casas',C,[fd,ft,n1,EM].join('|')),PV=paginate('varones',V,[fv,fvt,fr,fgp,fgr,n2].join('|'));
  $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${PC.pg.map(ccard).join('')}</div>${PC.bar}`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
  $('#lv0').innerHTML=V.length?`<div class=vgrid>${PV.pg.map(vcard).join('')}</div>${PV.bar}`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
@@ -174,7 +183,7 @@ function dirty(){$('#saveBtn').disabled=false;$('#st').className='save-status';$
 const find=el=>{const it=el.closest?.('.erow');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
 document.addEventListener('click',e=>{
  const ds=e.target.dataset||{};
- if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}
+ if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}if('fgr' in ds){fgr=ds.fgr;return cards();}
  if('pn' in ds){const[k,d]=ds.pn.split(':');PS[k].page+=+d;return cards();}
  if('pp' in ds){const[k,d]=ds.pp.split(':');ES[k].page+=+d;return elist(k);}
  const r=find(e.target);if(!r||!AUTH)return;const [arr,x]=r;
