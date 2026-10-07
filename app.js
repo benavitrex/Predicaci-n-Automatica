@@ -1,3 +1,4 @@
+document.documentElement.dataset.theme=localStorage.getItem('pj_theme')||'';
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const ORDEN=[1,2,3,4,5,6,0];
 const $=s=>document.querySelector(s);
@@ -36,7 +37,8 @@ async function save(msg='Actualiza casas y hermanos'){
 function shell(active){
   document.head.insertAdjacentHTML('beforeend',`<meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name=theme-color content="#101412"><meta name=apple-mobile-web-app-capable content=yes><meta name=apple-mobile-web-app-title content=Curauma><style>
 :root{--bg:#f3f5f3;--fg:#17201b;--mut:#66726b;--ac:#1f7a56;--ac2:#145a3f;--on:#fff;--ln:#dfe5e1;--card:#fff;--bad:#c0392b;--sh:0 1px 3px rgba(16,20,18,.08),0 4px 14px rgba(16,20,18,.06);--font:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
-@media(prefers-color-scheme:dark){:root{--bg:#101412;--fg:#e8eeea;--mut:#8f9d95;--ac:#4fc08d;--ac2:#0b0f0d;--on:#0b0f0d;--ln:#26302a;--card:#171d1a;--bad:#ff8a80;--sh:0 1px 3px rgba(0,0,0,.4)}}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#101412;--fg:#e8eeea;--mut:#8f9d95;--ac:#4fc08d;--ac2:#0b0f0d;--on:#0b0f0d;--ln:#26302a;--card:#171d1a;--bad:#ff8a80;--sh:0 1px 3px rgba(0,0,0,.4)}}
+:root[data-theme=dark]{--bg:#101412;--fg:#e8eeea;--mut:#8f9d95;--ac:#4fc08d;--ac2:#0b0f0d;--on:#0b0f0d;--ln:#26302a;--card:#171d1a;--bad:#ff8a80;--sh:0 1px 3px rgba(0,0,0,.4)}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 var(--font)}
 .skip{position:absolute;left:-999px}.skip:focus{left:8px;top:8px;z-index:20;background:var(--card);padding:6px 12px;border-radius:8px}
 header.top{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--card) 88%,transparent);-webkit-backdrop-filter:saturate(1.4) blur(10px);backdrop-filter:saturate(1.4) blur(10px);border-bottom:1px solid var(--ln);padding-top:env(safe-area-inset-top)}
@@ -67,15 +69,24 @@ td select{width:100%}.warn{color:var(--bad)}#msg{position:fixed;bottom:16px;righ
 dialog{border:1px solid var(--ln);border-radius:14px;background:var(--card);color:var(--fg)}dialog label{display:block;margin:8px 0}dialog input{width:100%}
 .hero{padding:26px 0 10px}.eyebrow{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);font-weight:600;margin-bottom:2px}
 .hero h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:4px 0 6px;letter-spacing:-.02em}.hero h1 em{color:var(--ac);font-style:italic;font-weight:600}.sub{color:var(--mut);margin:0 0 12px}
+.rt{display:flex;align-items:center;gap:6px}.th{border-radius:50%;width:34px;height:34px;padding:0;font-size:17px;line-height:1}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.cc,.vc{background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}.cc b{font-size:16px}.ad{color:var(--mut);font-size:13px}
+.tag.acc{background:var(--ac);color:var(--on);align-self:flex-start;font-weight:600}.tag.rg{background:var(--card);border:1px solid var(--ln)}
+.vh{display:flex;flex-wrap:wrap;gap:6px;justify-content:space-between;align-items:center}.vh b{font-size:16px}.vd,.vt{display:flex;gap:4px;flex-wrap:wrap}
+.dd{min-width:32px;text-align:center;padding:5px 0;border-radius:8px;font-size:13px;font-weight:700;border:1px solid var(--ln);color:var(--mut);opacity:.45}.dd.on{background:var(--ac);color:var(--on);border-color:var(--ac);opacity:1}.dd.sel{outline:2px solid var(--fg);outline-offset:1px}
+.tg{font-size:12px;padding:2px 9px;border-radius:10px;border:1px solid var(--ln);color:var(--mut);opacity:.5}.tg.on{opacity:1;color:var(--ac);border-color:var(--ac);font-weight:600}
+.mh{border-top:4px solid var(--ac);padding-top:10px;margin:22px 0 10px}.mh h2{font-size:26px;margin:0}.mh h2,.arch b{text-transform:capitalize}
 [hidden]{display:none!important}
 @media print{header.top,.skip,.noprint,#msg{display:none!important}body{background:#fff;color:#000}td select{border:0;background:none;appearance:none;color:#000;padding:0}}
 </style>`);
-  document.body.insertAdjacentHTML('afterbegin',`<a class=skip href="#main">Ir al contenido</a><header class=top><div class=in><a class=brand href="index.html"><span class=logo>CC</span><span>Congregación Curauma</span></a><nav><a href="index.html" class="${active=='i'?'on':''}">Inicio</a><a href="programa.html" class="${active=='p'?'on':''}">Programa</a></nav></div><button id=cfgBtn hidden aria-hidden=true tabindex=-1></button></header>
+  document.body.insertAdjacentHTML('afterbegin',`<a class=skip href="#main">Ir al contenido</a><header class=top><div class=in><a class=brand href="index.html"><span class=logo>CC</span><span>Congregación Curauma</span></a><div class=rt><nav><a href="index.html" class="${active=='i'?'on':''}">Inicio</a><a href="programa.html" class="${active=='p'?'on':''}">Programa</a></nav><button id=thBtn class=th title="Modo claro / oscuro" aria-label="Modo claro / oscuro">◐</button></div></div><button id=cfgBtn hidden aria-hidden=true tabindex=-1></button></header>
 <dialog id=cfgDlg><form method=dialog style="display:block;min-width:min(320px,80vw)"><b>Conexión con GitHub</b>
 <label>Token (con permiso Contents: write)<input id=cT type=password autocomplete=off></label>
 <label>Usuario<input id=cO></label><label>Repositorio<input id=cR></label><label>Rama<input id=cB></label>
 <small>El token queda solo en este navegador.</small><p><button value=ok class=pri>Guardar</button> <button value=x>Cancelar</button></p></form></dialog><div id=msg></div>`);
   document.querySelector('main')?.setAttribute('id','main');
+  $('#thBtn').onclick=()=>{const r=document.documentElement,d=r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'),n=d=='dark'?'light':'dark';r.dataset.theme=n;localStorage.setItem('pj_theme',n);};
   $('#cfgBtn').onclick=()=>{const c=cfg();$('#cT').value=c.token||'';$('#cO').value=c.owner;$('#cR').value=c.repo;$('#cB').value=c.branch;$('#cfgDlg').showModal();};
   $('#cfgDlg').onclose=async e=>{if($('#cfgDlg').returnValue!='ok')return;
     localStorage.setItem('pj_cfg',JSON.stringify({token:$('#cT').value.trim(),owner:$('#cO').value.trim(),repo:$('#cR').value.trim(),branch:$('#cB').value.trim()||'main'}));

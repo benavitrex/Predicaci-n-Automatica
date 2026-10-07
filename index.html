@@ -4,7 +4,7 @@
  src="https://www.google.com/maps/d/embed?mid=1H8j2hSNLHMMxyiIiBI___XOZpPDxobc&ll=-33.1185198147293%2C-71.5801330577226&z=16"></iframe>
 <main>
 <div class="hero noprint"><span class="eyebrow">Registro</span><h1>Congregación <em>Curauma</em></h1><p class="sub">Casas y hermanos disponibles para la predicación, por día y turno.</p></div>
-<div class="grid">
+<div class="grid" style="grid-template-columns:1fr">
  <section class="card"><span class="eyebrow">Territorios</span><h2>Casas disponibles <span class="badge" id="nc"></span></h2>
   <div class="fl" id="fcd"></div><div class="fl" id="fct"></div><div id="lc0"></div></section>
  <section class="card"><span class="eyebrow">Grupos</span><h2>Varones disponibles <span class="badge" id="nv"></span></h2>
@@ -42,14 +42,18 @@ const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=d value=
 const dchips=(sel,a)=>ORDEN.map(d=>`<span class="chip ${d==sel?'on':''}" data-${a}=${d} tabindex=0>${DIAS[d].slice(0,3)}</span>`).join('');
 $('#fhd').innerHTML=boxes();$('#fcdd').innerHTML=boxes();
 
+const RG={AN:'Anciano',SM:'Siervo ministerial',PR:'Precursor regular',PE:'Precursor especial',PA:'Precursor auxiliar',PTJ:'Publicador',SC:'Superintendente de circuito'};
+const rango=t=>esc((t||'').split('/').map(x=>RG[x.trim()]||x.trim()).filter(Boolean).join(' · ')||'Publicador');
 function cards(){
  $('#fcd').innerHTML=dchips(fd,'fd');$('#fvd').innerHTML=dchips(fv,'fv');
  $('#fct').innerHTML=[['','Todos'],['M','Mañana'],['T','Tarde']].map(([v,l])=>`<span class="chip ${ft==v?'on':''}" data-ft="${v}" tabindex=0>${l}</span>`).join('');
  const C=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(fd)&&(!ft||turnoOk(x.turno,ft)));
  const V=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(fv));
  $('#nc').textContent=C.length;$('#nv').textContent=V.length;
- $('#lc0').innerHTML=C.map(x=>`<div class=row><b>${esc(x.nombre)}</b><small>${esc(x.dir||'')}${x.terr?' · Terr. '+esc(x.terr):''}</small><span class=tag>${TN[x.turno||'MT']}</span></div>`).join('')||'<small>Sin casas para este filtro.</small>';
- $('#lv0').innerHTML=V.map(x=>`<div class=row><b>${esc(x.nombre)}</b><small>${esc(x.tarea||'')}</small><span class=tag>${TN[x.turno||'MT']}</span></div>`).join('')||'<small>Nadie disponible ese día.</small>';
+ $('#lc0').innerHTML=C.length?`<div class=cg>${C.map(x=>`<article class=cc><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span></article>`).join('')}</div>`:'<small>Sin casas para este filtro.</small>';
+ $('#lv0').innerHTML=V.length?`<div class=cg>${V.map(x=>`<article class=vc><div class=vh><b>${esc(x.nombre)}</b><span class="tag rg">${rango(x.tarea)}</span></div>
+  <div class=vd title="Días disponibles">${ORDEN.map(d=>`<span class="dd ${x.dias.includes(d)?'on':''} ${d==fv?'sel':''}">${DIAS[d].slice(0,2)}</span>`).join('')}</div>
+  <div class=vt><small>Saca grupo:</small><span class="tg ${turnoOk(x.turno,'M')?'on':''}">☀ Mañana</span><span class="tg ${turnoOk(x.turno,'T')?'on':''}">🌙 Tarde</span></div></article>`).join('')}</div>`:'<small>Nadie disponible ese día.</small>';
 }
 function item(k,x){
  const h=k=='hermanos',g=!h||x.grupo;

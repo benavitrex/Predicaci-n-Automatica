@@ -7,7 +7,7 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 @media print{.ph{display:block;text-align:center;margin-bottom:8px}.pt{display:block}td select,.hint{display:none!important}.wk{display:block!important;box-shadow:none;border:0;page-break-after:always}.one .wk:not(.pr){display:none!important}td input{border:0;background:none;color:#000;padding:0}}
 </style></head><body>
 <main>
-<div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>mensual</em></h1><p class="sub">Elige el mes: la página asigna según la disponibilidad y el historial, y lo deja listo para imprimir.</p></div>
+<div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>Predicación</em></h1><p class="sub">Elige el mes: la página asigna según la disponibilidad y el historial, y lo deja listo para imprimir.</p></div>
 <section class="card noprint"><h2>1 · Elegir el mes</h2>
  <form id="f" style="padding:0">
   <label class="chk">Mes <input type="month" id="mes" required></label>
@@ -15,10 +15,11 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
  </form><small id="st"></small>
  <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><div id="hor" class="hg"></div></details>
 </section>
+<div id="mh" class="mh noprint"></div>
 <div id="tabs" class="fl noprint"></div>
 <div id="weeks"></div>
 <section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><div id="hist"></div>
- <small>Los meses guardados alimentan la rotación: quien tuvo más salidas queda de último y no se repite lo del mes anterior.</small><div class="grid" id="uso"></div></section>
+ <small>Archivo de meses guardados. Abre uno para revisarlo o corregirlo; el mes anterior se usa para no repetir asignaciones.</small></section>
 </main>
 <script src="app.js"></script>
 <script>
@@ -61,9 +62,9 @@ function gen(){
 }
 function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();$('#st').textContent='Mes guardado en el historial.';}
 
-const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),a=P(k),b=new Date(a);b.setDate(a.getDate()+6);const lo=new Date(y,m-1,1),hi=new Date(y,m,0),x=a<lo?lo:a,e=b>hi?hi:b;
- return x.toLocaleDateString('es-CL',{day:'numeric'})+' al '+e.toLocaleDateString('es-CL',{day:'numeric',month:s?'short':'long'});};
-const wrows=k=>ROWS.filter(r=>mon(r.f)==k).sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)||a.g-b.g);
+const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),e=k==3?new Date(y,m,0).getDate():k*7+7;return (k*7+1)+' al '+e+(s?'':' de '+new Date(y,m-1,1).toLocaleDateString('es-CL',{month:'long'}));};
+const wk=r=>Math.min(3,Math.floor((+r.f.slice(8)-1)/7));
+const wrows=k=>ROWS.filter(r=>wk(r)==k).sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)||a.g-b.g);
 const grp=(l,a,sel,u,fl)=>a.length?`<optgroup label="${l}">${a.map(x=>`<option value="${x.id}" ${x.id==sel?'selected':''}>${esc(x.nombre)} · ${u[x.id]||0}×${fl&&fl.has(x.id)?' ↺':''}</option>`).join('')}</optgroup>`:'';
 function sel(f,r,list,ok,u,fl,cur0){
  const okS=[...ok].sort((a,b)=>(u[a.id]||0)-(u[b.id]||0)),rest=list.filter(x=>!ok.includes(x));
@@ -80,19 +81,17 @@ function weekHtml(k,i,uC,uH){
   <td>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class=pt>${esc(h?.nombre||'')}</span><span class=hint>${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span></td>
   <td>${sel('c',r,DB.casas,okC,uC,lastC,r.c)}<span class=pt>${esc(c?c.nombre+' — '+c.dir:'')}</span><span class=hint>${c?esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span></td>
   <td class=hr><input data-r=${r.id} data-f=terr value="${esc(r.terr)}"></td><td class=noprint><button data-del=${r.id} title="Quitar fila">✕</button></td></tr>`;}).join('');
- return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación</div>
+ return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación · ${mname(MES)}</div>
  <div class=wh><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2><span class=noprint><button data-add=${i}>+ Fila</button> <button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
  <div class=tw><table><thead><tr><th>FECHA</th><th>HORA</th><th>ENCARGADO</th><th>LUGAR DE ENCUENTRO</th><th>TERRITORIOS</th><th class=noprint></th></tr></thead><tbody>${body||'<tr><td colspan=6>Sin salidas esta semana.</td></tr>'}</tbody></table></div></section>`;
 }
 function render(){
- const s=new Set(ROWS.map(r=>mon(r.f)));WK=[...s].sort();cur=Math.max(0,Math.min(cur,WK.length-1));
+ WK=[0,1,2,3];$('#mh').innerHTML=MES?`<span class=eyebrow>Mes</span><h2>${mname(MES)}</h2><small>4 semanas · ${ROWS.length} salidas</small>`:'';cur=Math.max(0,Math.min(cur,WK.length-1));
  $('#tabs').innerHTML=WK.map((k,i)=>`<span class="chip ${i==cur?'on':''}" data-w=${i} tabindex=0>Sem ${i+1} · ${lab(k,1)}</span>`).join('');
  const[uC,uH]=counts();
  $('#weeks').innerHTML=WK.map((k,i)=>weekHtml(k,i,uC,uH)).join('')||'<section class="card"><small>Elige un mes para generar el programa.</small></section>';
  const ks=Object.keys(hist()).sort().reverse();
- $('#hist').innerHTML=ks.map(k=>`<div class=item><div><b>${mname(k)}</b> <small>${hist()[k].rows.length} salidas</small></div><button data-open=${k}>Abrir</button><button data-hd=${k} title="Eliminar del historial">✕</button></div>`).join('')||'<small>Aún no hay meses guardados.</small>';
- const[hc,hh]=usage('__'),tb=(t,a,u)=>`<div><h3>${t}</h3><table>${[...a].sort((x,y)=>(u[x.id]||0)-(u[y.id]||0)).map(x=>`<tr><td>${esc(x.nombre)}</td><td>${u[x.id]||0}</td></tr>`).join('')}</table></div>`;
- $('#uso').innerHTML=tb('Encargados · veces en historial',DB.hermanos.filter(x=>x.grupo),hh)+tb('Casas · veces en historial',DB.casas,hc);
+ $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow>${k.slice(0,4)}</span><b>${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button><button data-hd=${k} title="Eliminar del archivo">✕</button></div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
 }
 const txt=i=>`Programa de predicación — Congregación Curauma\nSemana del ${lab(WK[i])}\n`+wrows(WK[i]).map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
  return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
