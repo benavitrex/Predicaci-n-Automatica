@@ -1,38 +1,90 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><title>Programa</title>
+<html lang="es"><head><meta charset="utf-8"><title>Programa · Congregación Curauma</title>
 <style>
-.wk{display:none}.wk.cur{display:block}.wh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}.wh h2{margin:0}
-.ph,.pt{display:none}.hint{display:block;font-size:12px;color:var(--mut)}.hg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;margin-top:8px}
-td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.tw{overflow-x:auto}
-@media print{.ph{display:block;text-align:center;margin-bottom:8px}.pt{display:block}td select,.hint{display:none!important}.wk{display:block!important;box-shadow:none;border:0;page-break-after:always}.one .wk:not(.pr){display:none!important}td input{border:0;background:none;color:#000;padding:0}}
+.wk{display:none}.wk.cur{display:block}
+.wh{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;justify-content:space-between;margin-bottom:14px}.wh h2{margin:0}.wh h2 small{font:400 13px Inter,sans-serif;margin-left:6px}.wh .eyebrow{margin-bottom:6px}
+.ph{display:none}
+.mh{margin:26px 0 12px}.mh h2{font-size:30px;text-transform:capitalize;margin:0 0 2px}
+.hg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:10px}
+.hg>div{background:var(--fill);border-radius:10px;padding:10px 12px}
+details summary{cursor:pointer;font-weight:600;font-size:13px;margin-top:12px}
+.tx{display:block}table.em .tx{display:none}
+td.day{white-space:nowrap;width:110px}
+.dn{display:inline-block;font:600 24px/1 var(--serif);letter-spacing:-.02em;margin-right:8px;vertical-align:baseline}
+.dw{font:600 10.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+td.rep .dl{display:none}
+tr.first:not(:first-child) td{border-top:1px solid color-mix(in srgb,var(--ink) 16%,var(--line))}
+td.hr{width:128px}.hv{font:600 15px var(--mono)}
+td.hr .tag{margin-top:5px;display:block;width:max-content}
+td b{font-weight:600}.cap{display:block;font-size:12px;color:var(--soft);margin-top:3px;line-height:1.4}
+td select,td input.ed{width:100%}td input.ed.hora{width:92px;font:600 14px var(--mono)}td input.ed.terr{width:84px;text-align:center;font:600 13px var(--mono)}
+td .tag{font-size:11.5px}
+@media screen and (max-width:680px){
+ .table-wrap{border:0;background:transparent;overflow:visible}
+ table{min-width:0;display:block}thead{display:none}
+ tbody{display:flex;flex-direction:column;gap:10px}
+ tbody tr{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 14px;box-shadow:var(--shadow)}
+ tbody tr:hover{background:var(--card)}
+ tbody tr td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;border-bottom:1px dashed var(--line);padding:9px 0;text-align:right;width:auto}
+ tbody tr td:last-child{border-bottom:0}
+ tbody tr td::before{content:attr(data-label);font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--soft);flex:none;text-align:left}
+ tbody tr td.day{justify-content:flex-start;border-bottom:1px solid var(--line)}tbody tr td.day::before{content:none}
+ td.rep .dl{display:inline}tr.first:not(:first-child) td{border-top:0}
+ td.hr{width:auto}td.hr .tag{display:inline-block;margin:0 0 0 8px}
+ td:empty{display:none}
+ td select,td input.ed{max-width:60%}
+ table.em td>*:not(.cap){text-align:left}
+}
+@media print{
+ .ph{display:block;text-align:center;margin-bottom:10px;font-size:15px}
+ .ed,.noprint,.cap.ed{display:none!important}
+ table.em .tx{display:block!important}
+ .wk{display:block!important;box-shadow:none;border:0;padding:0;page-break-after:always}
+ .one .wk:not(.pr){display:none!important}
+ .table-wrap{border:0;overflow:visible}
+ table{min-width:0}
+ th{background:#eee!important;color:#000}
+ td,th{border-bottom:1px solid #bbb;padding:8px 10px}
+ .wh .eyebrow{display:none}
+ .mut{color:#555}
+}
 </style></head><body>
 <main>
-<div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>Predicación</em></h1><p class="sub">Elige el mes: la página asigna según la disponibilidad y el historial, y lo deja listo para imprimir.</p></div>
-<section class="card noprint"><h2>1 · Elegir el mes</h2>
- <form id="f" style="padding:0">
+<div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>Predicación</em></h1><p class="sub">Elige el mes para ver el programa. Si tienes acceso de edición, puedes generarlo y ajustarlo.</p></div>
+
+<section class="card noprint"><span class="eyebrow">Programa</span><h2>Elegir el mes</h2>
+ <p class="hint">Cada mes se arma por semanas; el mes anterior se usa para no repetir asignaciones.</p>
+ <form id="f">
   <label class="chk">Mes <input type="month" id="mes" required></label>
-  <button class="pri" title="Agrega las salidas que falten sin tocar lo que ya editaste">Generar</button><button type="button" id="rg" title="Rehace todo el mes desde cero">Regenerar todo el mes</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
- </form><small id="st"></small>
- <small class=hint style="margin-top:6px"><b>Generar</b>: agrega las salidas que falten (por ejemplo, tras marcar la tarde en otro día) sin tocar lo que ya editaste. <b>Regenerar todo el mes</b>: borra el programa en pantalla y lo arma de nuevo desde cero.</small>
- <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><small class=hint style="margin-top:6px">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</small><div id="hor" class="hg"></div></details>
+  <span id="ed" hidden style="display:contents"><button class="pri" title="Agrega las salidas que falten sin tocar lo que ya editaste">Generar</button><button type="button" id="rg" title="Rehace todo el mes desde cero">Regenerar todo el mes</button></span>
+  <button type="button" id="pm" class="ghost">🖨️ Imprimir mes</button>
+ </form>
+ <p class="hint" id="gh" hidden style="margin:0"><b>Generar</b>: agrega las salidas que falten (por ejemplo, tras marcar la tarde en otro día) sin tocar lo que ya editaste. <b>Regenerar todo el mes</b>: borra el programa en pantalla y lo arma de nuevo desde cero.</p>
+ <details id="hd" hidden><summary>Horarios por día (hora y salidas por horario)</summary><p class="hint" style="margin:6px 0 0">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</p><div id="hor" class="hg"></div></details>
 </section>
 <div id="mh" class="mh noprint"></div>
 <div id="tabs" class="fl noprint"></div>
 <div id="weeks"></div>
-<section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><div id="hist"></div>
- <small>Archivo de meses guardados. Abre uno para revisarlo o corregirlo; el mes anterior se usa para no repetir asignaciones.</small></section>
+<section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><p class="hint">Archivo de meses guardados. Abre uno para revisarlo; el mes anterior se usa para no repetir asignaciones.</p><div id="hist"></div></section>
 </main>
+
+<div class="edit-bar noprint" id="editBar" hidden role="toolbar" aria-label="Edición">
+ <button id="editModeBtn" type="button" aria-pressed="false">✏️ Edición: off</button>
+ <span class="save-status" id="st" role="status" aria-live="polite"></span>
+ <button id="sv" class="pri" type="button" disabled>Guardar en historial</button>
+</div>
+
 <script src="app.js"></script>
 <script>
-shell('p');document.body.classList.add('pg');
+shell('p');
+let AUTH=false,EM=false,dirty=false;
 const uid=()=>Math.random().toString(36).slice(2,9);
 const H=JSON.parse(localStorage.getItem('pj_hor')||'null')||{0:['10:30',1],1:['10:00',1],2:['10:00',1],3:['10:00, 18:00',1],4:['10:00',1],5:['10:00, 18:00',1],6:['10:30',1]};
 if(!localStorage.getItem('pj_hor_m')){[3,5].forEach(d=>{if(!/\b(1[4-9]|2\d):/.test(H[d][0]))H[d][0]=[H[d][0].trim(),'18:00'].filter(Boolean).join(', ');});localStorage.setItem('pj_hor_m','1');localStorage.setItem('pj_hor',JSON.stringify(H));}
-$('#hor').innerHTML=ORDEN.map(d=>`<div><b>${DIAS[d]}</b><br><input data-h=${d} value="${H[d][0]}" size=11 placeholder="10:00, 18:00"> <input data-n=${d} type=number min=0 max=6 value=${H[d][1]} style="width:52px" title="Salidas por horario"><br><label class=chk><input type=checkbox data-tt=${d} ${/\b(1[4-9]|2\d):/.test(H[d][0])?'checked':''}>Salida en la tarde (18:00)</label></div>`).join('');
+$('#hor').innerHTML=ORDEN.map(d=>`<div><b>${DIAS[d]}</b><br><input data-h=${d} value="${H[d][0]}" size=11 placeholder="10:00, 18:00"> <input data-n=${d} type=number min=0 max=6 value=${H[d][1]} style="width:60px" title="Salidas por horario"><br><label class=chk style="margin-top:6px"><input type=checkbox data-tt=${d} ${/\b(1[4-9]|2\d):/.test(H[d][0])?'checked':''}>Salida en la tarde (18:00)</label></div>`).join('');
 $('#hor').onchange=e=>{const d=e.target.dataset.tt;if(d===undefined)return;const i=$(`[data-h="${d}"]`),h=i.value.split(',').map(s=>s.trim()).filter(s=>s&&s<'14:00');if(e.target.checked)h.push('18:00');i.value=h.join(', ');};
 let ROWS=[],MES='',WK=[],cur=0;
 const iso=d=>d.toLocaleDateString('sv'),P=s=>{const[a,b,c]=s.split('-');return new Date(a,b-1,c)};
-const mon=s=>{const x=P(s);x.setDate(x.getDate()-((x.getDay()+6)%7));return iso(x)};
 const hist=()=>DB.historial||(DB.historial={});
 const mname=k=>{const[a,b]=k.split('-');return new Date(a,b-1,1).toLocaleDateString('es-CL',{month:'long',year:'numeric'})};
 const prevKey=m=>{const[a,b]=m.split('-').map(Number);return iso(new Date(a,b-2,1)).slice(0,7)};
@@ -40,6 +92,10 @@ const dabbr=a=>ORDEN.filter(d=>a.includes(d)).map(d=>DIAS[d].slice(0,2)).join(' 
 function usage(ex){const c={},h={};for(const[k,v]of Object.entries(hist())){if(k==ex)continue;for(const r of v.rows){if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;}}return[c,h];}
 function counts(){const[c,h]=usage(MES);ROWS.forEach(r=>{if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;});return[c,h];}
 const best=(a,sc,l)=>a.map(x=>[x,sc(x)]).sort((p,q)=>p[1]-q[1]||(l[p[0].id]??-1)-(l[q[0].id]??-1))[0]?.[0];
+
+function chg(msg){dirty=true;$('#sv').disabled=false;$('#st').className='save-status';$('#st').textContent=msg||'Cambios sin guardar';}
+function clean(msg,cls=''){dirty=false;$('#sv').disabled=true;$('#st').className='save-status '+cls;$('#st').textContent=msg||'';}
+addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 
 function gen(keep){
  document.querySelectorAll('[data-h]').forEach(i=>H[i.dataset.h][0]=i.value);
@@ -64,9 +120,12 @@ function gen(keep){
    }
   }
  }
- const nn=ROWS.length-old.length;if(!keep)cur=0;render();$('#st').textContent=keep?(nn?nn+' salida(s) agregada(s); lo demás quedó igual. Sin guardar.':'No falta ninguna salida según los horarios.'):'Programa regenerado desde cero, sin guardar. Revísalo y edita lo que haga falta.';
+ const nn=ROWS.length-old.length;if(!keep)cur=0;render();
+ if(!keep||nn)chg(keep?nn+' salida(s) agregada(s); lo demás quedó igual. Sin guardar.':'Programa regenerado desde cero, sin guardar. Revísalo y edita lo que haga falta.');
+ else $('#st').textContent='No falta ninguna salida según los horarios.';
 }
-function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();$('#st').textContent='Mes guardado en el historial.';}
+function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();clean('Mes guardado en el historial.');}
+function emptyMonth(){ROWS=[];cur=0;render();clean('');}
 
 const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),e=k==3?new Date(y,m,0).getDate():k*7+7;return (k*7+1)+' al '+e+(s?'':' de '+new Date(y,m-1,1).toLocaleDateString('es-CL',{month:'long'}));};
 const wk=r=>Math.min(3,Math.floor((+r.f.slice(8)-1)/7));
@@ -74,30 +133,41 @@ const wrows=k=>ROWS.filter(r=>wk(r)==k).sort((a,b)=>a.f.localeCompare(b.f)||a.ho
 const grp=(l,a,sel,u,fl)=>a.length?`<optgroup label="${l}">${a.map(x=>`<option value="${x.id}" ${x.id==sel?'selected':''}>${esc(x.nombre)} · ${u[x.id]||0}×${fl&&fl.has(x.id)?' ↺':''}</option>`).join('')}</optgroup>`:'';
 function sel(f,r,list,ok,u,fl,cur0){
  const okS=[...ok].sort((a,b)=>(u[a.id]||0)-(u[b.id]||0)),rest=list.filter(x=>!ok.includes(x));
- return `<select data-r=${r.id} data-f=${f}><option value="">— sin asignar —</option>${grp('✓ Recomendados (disponibles ese día)',okS,cur0,u,fl)}${grp('Otros',rest,cur0,u,fl)}</select>`;
+ return `<select class=ed data-r=${r.id} data-f=${f}><option value="">— sin asignar —</option>${grp('✓ Recomendados (disponibles ese día)',okS,cur0,u,fl)}${grp('Otros',rest,cur0,u,fl)}</select>`;
 }
 function weekHtml(k,i,uC,uH){
  const rows=wrows(k),hasPm=new Set(rows.filter(x=>x.hora>='14:00').map(x=>x.f)),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
  const body=rows.map(r=>{
-  const dow=P(r.f).getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
-  const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
+  const d=P(r.f),dow=d.getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
   const first=r.f!=pd;pd=r.f;
-  return `<tr class="${t=='M'?'am':'pm'}"><td class=day>${first?P(r.f).toLocaleDateString('es-CL',{weekday:'long',day:'2-digit'}).toUpperCase()+(hasPm.has(r.f)?'':`<br><button class="mini noprint" data-pm="${r.f}" title="Añadir salida en la tarde">+ Tarde</button>`):''}</td>
-  <td class=hr><input data-r=${r.id} data-f=hora value="${esc(r.hora)}">${r.g?`<small class=hint>Grupo ${r.g}</small>`:''}</td>
-  <td>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class=pt>${esc(h?.nombre||'')}</span><span class=hint>${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span></td>
-  <td>${sel('c',r,DB.casas.filter(x=>x.activa!==false||x.id==r.c),okC,uC,lastC,r.c)}<span class=pt>${esc(c?c.nombre+' — '+c.dir:'')}</span><span class=hint>${c?(c.activa===false?'⚠ Casa en pausa · ':'')+esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span></td>
-  <td class=hr><input data-r=${r.id} data-f=terr value="${esc(r.terr)}"></td><td class=noprint><button data-del=${r.id} title="Quitar fila">✕</button></td></tr>`;}).join('');
+  const day=`<span class=dl><span class=dn>${String(d.getDate()).padStart(2,'0')}</span><span class=dw>${d.toLocaleDateString('es-CL',{weekday:'long'})}</span></span>`;
+  const addPm=EM&&first&&!hasPm.has(r.f)?`<br><button class="mini noprint" data-pm="${r.f}" title="Añadir salida en la tarde">+ Tarde</button>`:'';
+  let hc='',cc='',tc='',ac='';
+  hc=`<span class=tx><b class=hv>${esc(r.hora)}</b></span>${EM?`<input class="ed hora" data-r=${r.id} data-f=hora value="${esc(r.hora)}">`:''}${r.g?`<span class=cap>Grupo ${r.g}</span>`:''}<span class="tag ${t=='M'?'am':'pm'}">${t=='M'?'Mañana':'Tarde'}</span>`;
+  if(EM){
+   const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
+   ac=`<span class=tx>${h?`<b>${esc(h.nombre)}</b>`:'<span class=mut>Sin encargado</span>'}</span>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class="cap ed">${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span>`;
+   cc=`<span class=tx>${c?`<b>${esc(c.nombre)}</b><span class=cap>${esc(c.dir)}</span>`:'<span class=mut>Sin casa</span>'}</span>${sel('c',r,DB.casas.filter(x=>x.activa!==false||x.id==r.c),okC,uC,lastC,r.c)}<span class="cap ed">${c?(c.activa===false?'⚠ Casa en pausa · ':'')+esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span>`;
+   tc=`<span class=tx>${r.terr?`<span class="tag active">${esc(r.terr)}</span>`:'<span class=mut>—</span>'}</span><input class="ed terr" data-r=${r.id} data-f=terr value="${esc(r.terr)}">`;
+  }else{
+   ac=`<span class=tx>${h?`<b>${esc(h.nombre)}</b>`:'<span class=mut>Sin encargado</span>'}</span>`;
+   cc=`<span class=tx>${c?`<b>${esc(c.nombre)}</b><span class=cap>${esc(c.dir)}</span>`:'<span class=mut>Sin casa</span>'}</span>`;
+   tc=`<span class=tx>${r.terr?`<span class="tag active">${esc(r.terr)}</span>`:'<span class=mut>—</span>'}</span>`;
+  }
+  return `<tr class="${t=='M'?'am':'pm'}${first?' first':''}"><td class="day${first?'':' rep'}" data-label="Fecha">${day}${addPm}</td>
+  <td class=hr data-label="Hora">${hc}</td><td data-label="Encargado">${ac}</td><td data-label="Lugar">${cc}</td><td data-label="Territorio">${tc}</td>${EM?`<td class=noprint data-label=""><button class="small danger" data-del=${r.id} title="Quitar fila">✕</button></td>`:''}</tr>`;}).join('');
  return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación · ${mname(MES)}</div>
- <div class=wh><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2><span class=noprint><button data-add=${i}>+ Fila</button> <button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
- <div class=tw><table><thead><tr><th>FECHA</th><th>HORA</th><th>ENCARGADO</th><th>LUGAR DE ENCUENTRO</th><th>TERRITORIOS</th><th class=noprint></th></tr></thead><tbody>${body||'<tr><td colspan=6>Sin salidas esta semana.</td></tr>'}</tbody></table></div></section>`;
+ <div class=wh><div><span class=eyebrow>Semana ${i+1}</span><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2></div><span class=noprint>${EM?`<button data-add=${i}>+ Fila</button> `:''}<button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
+ <div class=table-wrap><table class="${EM?'em':''}"><thead><tr><th>Fecha</th><th>Hora</th><th>Encargado</th><th>Lugar de encuentro</th><th>Territorios</th>${EM?'<th class=noprint></th>':''}</tr></thead><tbody>${body||`<tr><td colspan=${EM?6:5}>Sin salidas esta semana.</td></tr>`}</tbody></table></div></section>`;
 }
 function render(){
- WK=[0,1,2,3];$('#mh').innerHTML=MES?`<span class=eyebrow>Mes</span><h2>${mname(MES)}</h2><small>4 semanas · ${ROWS.length} salidas</small>`:'';cur=Math.max(0,Math.min(cur,WK.length-1));
- $('#tabs').innerHTML=WK.map((k,i)=>`<span class="chip ${i==cur?'on':''}" data-w=${i} tabindex=0>Sem ${i+1} · ${lab(k,1)}</span>`).join('');
+ WK=[0,1,2,3];const has=ROWS.length>0;
+ $('#mh').innerHTML=MES?`<span class=eyebrow>Mes</span><h2>${mname(MES)}</h2><small>${has?'4 semanas · '+ROWS.length+' salidas':'Sin salidas'}</small>`:'';cur=Math.max(0,Math.min(cur,WK.length-1));
+ $('#tabs').innerHTML=has?WK.map((k,i)=>`<span class="chip ${i==cur?'on':''}" data-w=${i} tabindex=0>Sem ${i+1} · ${lab(k,1)}</span>`).join(''):'';
  const[uC,uH]=counts();
- $('#weeks').innerHTML=WK.map((k,i)=>weekHtml(k,i,uC,uH)).join('')||'<section class="card"><small>Elige un mes para generar el programa.</small></section>';
+ $('#weeks').innerHTML=has?WK.map((k,i)=>weekHtml(k,i,uC,uH)).join(''):`<section class="card"><p class="hint" style="margin:0">${!MES?'Elige un mes para ver el programa.':EM?'No hay salidas con los horarios actuales.':'Aún no hay un programa guardado para este mes.'}</p></section>`;
  const ks=Object.keys(hist()).sort().reverse();
- $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow>${k.slice(0,4)}</span><b>${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button><button data-hd=${k} title="Eliminar del archivo">✕</button></div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
+ $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow style="margin:0">${k.slice(0,4)}</span><b style="text-transform:capitalize;font-family:var(--serif);font-size:18px">${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button>${EM?`<button data-hd=${k} class=danger title="Eliminar del archivo">✕</button>`:''}</div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
 }
 function addPm(f){
  const dow=P(f).getDay(),[uC,uH]=counts(),used=ROWS.filter(r=>r.f==f&&r.hora=='18:00'),uc=new Set(used.map(r=>r.c)),uh=new Set(used.map(r=>r.h));
@@ -109,32 +179,48 @@ function addPm(f){
 }
 const txt=i=>`Programa de predicación — Congregación Curauma\nSemana del ${lab(WK[i])}\n`+wrows(WK[i]).map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
  return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
-$('#weeks').onchange=e=>{const t=e.target,r=ROWS.find(x=>x.id==t.dataset.r),f=t.dataset.f;if(!r)return;r[f]=t.value;
- if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.cerca?.[0]||DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h'||f=='hora')render();$('#st').textContent='Cambios sin guardar en el historial.';};
+$('#weeks').onchange=e=>{if(!EM)return;const t=e.target,r=ROWS.find(x=>x.id==t.dataset.r),f=t.dataset.f;if(!r)return;r[f]=t.value;
+ if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.cerca?.[0]||DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h'||f=='hora')render();chg();};
 document.addEventListener('click',async e=>{const d=e.target.dataset||{};
  if(d.w!==undefined){cur=+d.w;render();}
- if(d.pm){addPm(d.pm);render();$('#st').textContent='Cambios sin guardar en el historial.';}
- if(d.del){ROWS=ROWS.filter(r=>r.id!=d.del);render();}
- if(d.add!==undefined){const f=prompt('Fecha de la nueva fila (AAAA-MM-DD)',wrows(WK[d.add])[0]?.f||'');if(f)ROWS.push({id:uid(),f,hora:'10:00',g:0,c:'',h:'',terr:''});render();}
+ if(d.pm&&EM){addPm(d.pm);render();chg();}
+ if(d.del&&EM){ROWS=ROWS.filter(r=>r.id!=d.del);render();chg();}
+ if(d.add!==undefined&&EM){const f=prompt('Fecha de la nueva fila (AAAA-MM-DD)',wrows(WK[d.add])[0]?.f||'');if(f){ROWS.push({id:uid(),f,hora:'10:00',g:0,c:'',h:'',terr:''});render();chg();}}
  if(d.pdf!==undefined){document.body.classList.add('one');document.querySelectorAll('.wk').forEach((w,j)=>w.classList.toggle('pr',j==+d.pdf));print();}
  if(d.send!==undefined){const t=txt(+d.send);if(navigator.share)navigator.share({title:'Programa de predicación',text:t}).catch(()=>{});else{navigator.clipboard?.writeText(t);open('https://wa.me/?text='+encodeURIComponent(t),'_blank');toast('Texto copiado');}}
- if(d.open)openMonth(d.open);
- if(d.hd&&confirm('¿Eliminar '+mname(d.hd)+' del historial?')){delete hist()[d.hd];localStorage.setItem('pj_hist',JSON.stringify(hist()));try{await save('Elimina '+d.hd);}catch(x){toast(x.message);}render();}
+ if(d.open){if(dirty&&!confirm('Tienes cambios sin guardar. ¿Abrir otro mes de todos modos?'))return;openMonth(d.open);}
+ if(d.hd&&EM&&confirm('¿Eliminar '+mname(d.hd)+' del historial?')){delete hist()[d.hd];localStorage.setItem('pj_hist',JSON.stringify(hist()));try{await save('Elimina '+d.hd);toast('Mes eliminado','ok');}catch(x){toast(x.message,'err');}render();}
 });
 addEventListener('afterprint',()=>document.body.classList.remove('one'));
 $('#pm').onclick=()=>print();
-$('#sv').onclick=async()=>{if(!ROWS.length)return toast('Genera un mes primero');
+$('#sv').onclick=async()=>{if(!AUTH)return;if(!ROWS.length)return toast('Genera un mes primero');
  hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{f:r.f,hora:r.hora,g:r.g,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr};})};
  localStorage.setItem('pj_hist',JSON.stringify(hist()));
- try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub)');}catch(e){toast('Guardado solo en este navegador: '+e.message);}
- $('#st').textContent='Mes guardado en el historial.';render();};
-$('#f').onsubmit=e=>{e.preventDefault();MES=$('#mes').value;if(!MES)return;if(!ROWS.length||ROWS[0].f.slice(0,7)!=MES)return hist()[MES]?openMonth(MES):gen();gen(true);};
+ $('#sv').disabled=true;$('#st').className='save-status';$('#st').textContent='Guardando…';
+ try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub) ✓','ok');clean('Guardado ✓','ok');}
+ catch(e){toast('Guardado solo en este navegador: '+e.message,'err');$('#sv').disabled=false;$('#st').className='save-status err';$('#st').textContent=e.message;}
+ render();};
+$('#f').onsubmit=e=>{e.preventDefault();if(!EM)return;MES=$('#mes').value;if(!MES)return;if(!ROWS.length||ROWS[0].f.slice(0,7)!=MES)return hist()[MES]?openMonth(MES):gen();gen(true);};
 $('#rg').onclick=()=>{MES=$('#mes').value;if(!MES)return;if(!confirm('Se rehará todo el programa de '+mname(MES)+' desde cero y se perderán los cambios manuales de la pantalla. ¿Continuar?'))return;gen();};
-$('#mes').onchange=()=>{MES=$('#mes').value;if(!MES)return;hist()[MES]?openMonth(MES):gen();};
+$('#mes').onchange=()=>{MES=$('#mes').value;if(!MES)return;if(dirty&&!confirm('Tienes cambios sin guardar. ¿Cambiar de mes de todos modos?')){$('#mes').value=ROWS[0]?.f.slice(0,7)||MES;MES=$('#mes').value;return;}hist()[MES]?openMonth(MES):EM?gen():emptyMonth();};
+$('#editModeBtn').onclick=()=>{
+ EM=!EM;
+ $('#editModeBtn').textContent=EM?'✏️ Edición: on':'✏️ Edición: off';$('#editModeBtn').setAttribute('aria-pressed',EM);
+ $('#ed').hidden=!EM;$('#hd').hidden=!EM;$('#gh').hidden=!EM;
+ if(EM&&MES&&!ROWS.length)gen();else render();
+ toast(EM?'Modo edición activado — puedes editar el programa':'Modo edición desactivado',EM?'ok':'');
+};
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip'))e.target.click();});
-load().then(()=>{
+load().then(async()=>{
+ AUTH=await auth();
+ $('#who').textContent=AUTH?'🔓 Edición habilitada':(cfg().token?'⚠ Token inválido o sin permiso · solo lectura':'🔒 Solo lectura');
+ if(!AUTH&&cfg().token)toast('Token inválido o sin permiso · solo lectura','err');
+ $('#editBar').hidden=!AUTH;
  const Lc=JSON.parse(localStorage.getItem('pj_hist')||'{}');for(const k in Lc)if(!hist()[k])hist()[k]=Lc[k];
- const n=new Date();n.setMonth(n.getMonth()+1,1);MES=iso(n).slice(0,7);$('#mes').value=MES;
- hist()[MES]?openMonth(MES):gen();
+ const n=new Date();n.setMonth(n.getMonth()+1,1);MES=iso(n).slice(0,7);
+ const ks=Object.keys(hist()).sort();
+ if(!hist()[MES]&&!AUTH&&ks.length)MES=ks[ks.length-1];
+ $('#mes').value=MES;
+ hist()[MES]?openMonth(MES):emptyMonth();
 });
 </script></body></html>

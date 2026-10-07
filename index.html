@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><title>Predicación</title></head><body>
+<html lang="es"><head><meta charset="utf-8"><title>Predicación · Congregación Curauma</title></head><body>
 <iframe class="map" title="Mapa de territorios" loading="lazy" allowfullscreen
  src="https://www.google.com/maps/d/embed?mid=1H8j2hSNLHMMxyiIiBI___XOZpPDxobc&ll=-33.1185198147293%2C-71.5801330577226&z=16"></iframe>
 <main>
@@ -12,7 +12,7 @@
   <div class="frow"><span class="fl-l">Turno</span><div class="fl" id="fct"></div></div>
   <div id="lc0"></div></section>
  <section class="card"><span class="eyebrow">Grupos</span><h2>Varones disponibles <span class="badge" id="nv"></span></h2>
-  <p class="sub">Quién puede sacar grupo, según rango, día y turno.</p>
+  <p class="sub">Quién puede sacar grupo, según rango, día y turno. Cada tarjeta muestra la semana completa.</p>
   <input id="q2" type="search" placeholder="Buscar hermano…" aria-label="Buscar hermano">
   <div class="vbar">
   <div class="frow"><span class="fl-l">Grupo</span><div class="fl" id="fvg"></div></div>
@@ -23,10 +23,8 @@
   <div id="lv0"></div></section>
 </div>
 
-<div class="bar noprint"><small id="who"></small><span class="sp"></span>
- <button id="bh" class="pri">Añadir Hermanos</button><button id="bc">Añadir Casas</button><button id="saveBtn" class="pri" hidden disabled>Guardar en GitHub</button></div>
-
-<section class="card" id="ph" hidden><h2>Hermanos</h2>
+<section class="card noprint" id="ph" hidden><span class="eyebrow">Edición</span><h2>Hermanos</h2>
+ <p class="sub">Añade hermanos y marca los días en que sacan grupo.</p>
  <form id="fh">
   <input name="nombre" placeholder="Nombre" required>
   <input name="tarea" placeholder="Tarea (AN, SM, PTJ…)" size="14">
@@ -35,7 +33,8 @@
   <span id="fhd"></span><button class="pri">Añadir</button>
  </form><div id="lh"></div></section>
 
-<section class="card" id="pc" hidden><h2>Casas</h2>
+<section class="card noprint" id="pc" hidden><span class="eyebrow">Edición</span><h2>Casas</h2>
+ <p class="sub">Añade casas y marca los días en que pueden recibir el grupo.</p>
  <form id="fc">
   <input name="nombre" placeholder="Familia (ej. Fam. Cabezas)" required>
   <input name="dir" placeholder="Dirección" required>
@@ -44,14 +43,20 @@
   <span id="fcdd"></span><button class="pri">Añadir</button>
  </form><div id="lc"></div></section>
 </main>
+
+<div class="edit-bar noprint" id="editBar" hidden role="toolbar" aria-label="Edición">
+ <button id="editModeBtn" type="button" aria-pressed="false">✏️ Edición: off</button>
+ <span class="save-status" id="st" role="status" aria-live="polite"></span>
+ <button id="saveBtn" class="pri" type="button" disabled>Guardar cambios</button>
+</div>
+
 <script src="app.js"></script>
 <script>
 shell('i');
-let AUTH=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
+let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
 const TN={MT:'Mañana y tarde',M:'Mañana',T:'Tarde'};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=d value=${d} ${d>0?'checked':''}>${DIAS[d].slice(0,3)}</label>`).join('');
-const dchips_old=(sel,a)=>ORDEN.map(d=>`<span class="chip ${d==sel?'on':''}" data-${a}=${d} tabindex=0>${DIAS[d].slice(0,3)}</span>`).join('');
 $('#fhd').innerHTML=boxes();$('#fcdd').innerHTML=boxes();
 
 const RG={AN:'Anciano',SM:'Siervo ministerial',PR:'Precursor regular',PE:'Precursor especial',PA:'Precursor auxiliar',PTJ:'Publicador',SC:'Superintendente de circuito'};
@@ -61,10 +66,11 @@ const rk=x=>{const t=(x.tarea||'').split('/').map(s=>s.trim().toUpperCase()),an=
 const chips=(arr,cur,a)=>arr.map(([v,l])=>`<span class="chip ${cur==v?'on':''}" data-${a}="${v}" tabindex=0>${l}</span>`).join('');
 const TURNOS=[['','Todos'],['M','☀ Mañana'],['T','🌙 Tarde']];
 function vcard(x){
- const r=rk(x).main,days=ORDEN.filter(d=>x.dias.includes(d)),one=fv>=0&&days.includes(fv);
- const big=!days.length?'<div class="vday none">Sin día asignado</div>':`<span class=lb>${one||days.length==1?'Día disponible':'Días disponibles'}</span><div class=vday>${one?DIAS[fv]:days.length==7?'Todos los días':days.map(d=>DIAS[d].slice(0,3)).join(' · ')}</div>`;
+ const r=rk(x).main,days=ORDEN.filter(d=>x.dias.includes(d));
+ const strip=ORDEN.map(d=>{const on=x.dias.includes(d);return `<span class="dd ${on?'on':''} ${d==fv?'sel':''}" title="${DIAS[d]}: ${on?'disponible':'no disponible'}">${DIAS[d].slice(0,2)}</span>`;}).join('');
+ const sum=!x.grupo?'No saca grupo':!days.length?'Sin día asignado':days.length==7?'Disponible todos los días':days.length+(days.length==1?' día':' días')+' a la semana · '+days.map(d=>DIAS[d].slice(0,3)).join(', ');
  return `<article class=vm><div class=vt><b class=vn>${esc(x.nombre)}</b><span class="bd rk-${r}">${rango(x.tarea)}</span></div>
-  <div>${big}</div>
+  <div><span class=lb>Semana · días disponibles</span><div class=wkd role=group aria-label="Días disponibles de ${esc(x.nombre)}">${strip}</div><div class=wsum>${sum}</div></div>
   <div class=vf><div class=vj>${turnoOk(x.turno,'M')?'<span class=bd>☀️ Mañana</span>':''}${turnoOk(x.turno,'T')?'<span class=bd>🌙 Tarde</span>':''}</div>
   <span class="lg ${x.grupo?'si':'no'}">${x.grupo?'✓ Saca grupo: Sí':'✕ Saca grupo: No'}</span></div></article>`;
 }
@@ -75,10 +81,10 @@ function cards(){
  $('#fvg').innerHTML=chips([['','Todos'],['si','Saca grupo']],fgp,'fg');
  $('#fvr').innerHTML=chips([['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']],fr,'fr');
  const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase(),ord={AN:0,SM:1,PRE:2,PUB:3};
- const C=DB.casas.filter(x=>(AUTH||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
+ const C=DB.casas.filter(x=>(EM||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
  const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ord[rk(a).main]-ord[rk(b).main]||a.nombre.localeCompare(b.nombre));
  $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
- $('#lc0').innerHTML=(AUTH?'<p class=sub style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${AUTH?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
+ $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
  $('#lv0').innerHTML=V.length?`<div class=vgrid>${V.map(vcard).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
 function item(k,x){
@@ -88,20 +94,21 @@ function item(k,x){
  ${h?`<label class=chk><input type=checkbox data-g ${x.grupo?'checked':''}>Puede sacar grupo</label>`:''}
  <div>${g?ORDEN.map(d=>`<span class="chip ${x.dias.includes(d)?'on':''}" data-d=${d} title="${h?'Día en que saca grupo':'Día disponible'}">${DIAS[d].slice(0,2)}</span>`).join(''):''}</div>
  <select data-t>${Object.keys(TN).map(t=>`<option value=${t} ${x.turno==t?'selected':''}>${TN[t]}</option>`).join('')}</select>
- <label class=chk><input type=checkbox data-a ${x.activa!==false?'checked':''}>Disponible</label><button data-del title="Eliminar">✕</button></div>`;
+ <label class=chk><input type=checkbox data-a ${x.activa!==false?'checked':''}>Disponible</label><button class="danger small" data-del title="Eliminar">✕</button></div>`;
 }
 function render(){
  cards();
- if(!AUTH)return;
+ $('#ph').hidden=$('#pc').hidden=!EM;
+ if(!EM)return;
  $('#lc').innerHTML=DB.casas.map(x=>item('casas',x)).join('')||'<small>Aún no hay casas.</small>';
  const G=DB.hermanos.filter(x=>x.grupo),O=DB.hermanos.filter(x=>!x.grupo);
  $('#lh').innerHTML=(G.length?`<h3>Pueden sacar grupo (${G.length})</h3>`+G.map(x=>item('hermanos',x)).join(''):'<small>Nadie marcado para sacar grupo.</small>')+(O.length?`<h3>Otros hermanos (${O.length})</h3>`+O.map(x=>item('hermanos',x)).join(''):'');
 }
-function dirty(){$('#saveBtn').disabled=false;}
+function dirty(){$('#saveBtn').disabled=false;$('#st').className='save-status';$('#st').textContent='Cambios sin guardar';}
 function add(e,k){
  e.preventDefault();const f=new FormData(e.target),h=k=='hermanos',g=h&&!!f.get('grupo');
  DB[k].push({id:uid(),nombre:f.get('nombre'),turno:f.get('turno'),dias:(!h||g)?f.getAll('d').map(Number):[],activa:true,...(h?{tarea:f.get('tarea')||'',gr:'',grupo:g}:{dir:f.get('dir')||'',terr:f.get('terr')||''})});
- e.target.reset();render();dirty();
+ e.target.reset();render();dirty();toast((f.get('nombre')||'Registro')+' añadido ✓','ok');
 }
 $('#fc').onsubmit=e=>add(e,'casas');$('#fh').onsubmit=e=>add(e,'hermanos');
 const find=el=>{const it=el.closest('.item');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
@@ -119,19 +126,24 @@ document.addEventListener('change',e=>{
  if('g' in ds){x.grupo=e.target.checked;if(x.grupo&&!x.dias.length)x.dias=[...ORDEN];render();}
  if('t' in ds)x.turno=e.target.value;if('a' in ds)x.activa=e.target.checked;dirty();cards();
 });
-function gate(id,panel,other){
- $(id).onclick=()=>{
-  if(!AUTH){toast('Ingresa un token válido para editar');return $('#cfgBtn').click();}
-  const p=$(panel);p.hidden=!p.hidden;if(!p.hidden)$(other).hidden=true;
- };
-}
 $('#q1').oninput=e=>{q1=e.target.value;cards();};$('#q2').oninput=e=>{q2=e.target.value;cards();};
-gate('#bh','#ph','#pc');gate('#bc','#pc','#ph');
-$('#saveBtn').onclick=async()=>{try{await save();$('#saveBtn').disabled=true;toast('Guardado en GitHub');}catch(e){toast('Error: '+e.message);}};
+$('#editModeBtn').onclick=()=>{
+ EM=!EM;
+ $('#editModeBtn').textContent=EM?'✏️ Edición: on':'✏️ Edición: off';
+ $('#editModeBtn').setAttribute('aria-pressed',EM);
+ render();
+ toast(EM?'Modo edición activado — gestiona hermanos y casas abajo':'Modo edición desactivado',EM?'ok':'');
+};
+window.addEventListener('beforeunload',e=>{if(!$('#saveBtn').disabled){e.preventDefault();e.returnValue='';}});
+$('#saveBtn').onclick=async()=>{
+ $('#saveBtn').disabled=true;$('#st').className='save-status';$('#st').textContent='Guardando…';
+ try{await save();$('#st').className='save-status ok';$('#st').textContent='Guardado ✓ (el sitio público se actualiza en ~1 min)';toast('Cambios guardados en GitHub ✓','ok');}
+ catch(e){$('#saveBtn').disabled=false;$('#st').className='save-status err';$('#st').textContent=e.message;toast('No se pudo guardar: '+e.message,'err');}
+};
 load().then(async()=>{
  AUTH=await auth();
  $('#who').textContent=AUTH?'🔓 Edición habilitada':(cfg().token?'⚠ Token inválido o sin permiso · solo lectura':'🔒 Solo lectura');
- ['#bh','#bc'].forEach(s=>$(s).textContent=(AUTH?'':'🔒 ')+$(s).textContent);
- $('#saveBtn').hidden=!AUTH;render();
+ if(!AUTH&&cfg().token)toast('Token inválido o sin permiso · solo lectura','err');
+ $('#editBar').hidden=!AUTH;render();
 });
 </script></body></html>
