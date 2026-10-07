@@ -1,60 +1,124 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><title>Programa</title></head><body>
+<html lang="es"><head><meta charset="utf-8"><title>Programa</title>
+<style>
+.wk{display:none}.wk.cur{display:block}.wh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:10px}.wh h2{margin:0}
+.ph,.pt{display:none}.hint{display:block;font-size:12px;color:var(--mut)}.hg{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;margin-top:8px}
+td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.tw{overflow-x:auto}
+@media print{.ph{display:block;text-align:center;margin-bottom:8px}.pt{display:block}td select,.hint{display:none!important}.wk{display:block!important;box-shadow:none;border:0;page-break-after:always}.one .wk:not(.pr){display:none!important}td input{border:0;background:none;color:#000;padding:0}}
+</style></head><body>
 <main>
-<section class="box noprint"><form id=f>
- <label class=chk>Desde <input type=date id=d1 required></label>
- <label class=chk>Hasta <input type=date id=d2 required></label>
- <button class=pri>Generar programa</button><button type=button id=pr>Imprimir / PDF</button>
-</form>
-<div id=hor style="padding:0 12px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px"></div></section>
-<h2 id=tit>Programa</h2>
-<table><thead><tr><th>Fecha</th><th>Hora</th><th>Encargado</th><th>Lugar de encuentro</th><th>Territorio</th></tr></thead><tbody id=tb></tbody></table>
+<section class="card noprint"><h2>Programa mensual</h2>
+ <form id="f" style="padding:0">
+  <label class="chk">Mes <input type="month" id="mes" required></label>
+  <button class="pri">Generar / regenerar</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
+ </form><small id="st"></small>
+ <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><div id="hor" class="hg"></div></details>
+</section>
+<div id="tabs" class="fl noprint"></div>
+<div id="weeks"></div>
+<section class="card noprint"><h2>Historial</h2><div id="hist"></div>
+ <small>Los meses guardados alimentan la rotación: quien tuvo más salidas queda de último y no se repite lo del mes anterior.</small><div class="grid" id="uso"></div></section>
 </main>
 <script src="app.js"></script>
 <script>
 shell('p');
+const uid=()=>Math.random().toString(36).slice(2,9);
 const H=JSON.parse(localStorage.getItem('pj_hor')||'null')||{0:['10:30',1],1:['10:00',1],2:['10:00',1],3:['10:00',1],4:['10:00',1],5:['10:00',1],6:['10:30',1]};
 $('#hor').innerHTML=ORDEN.map(d=>`<div><b>${DIAS[d]}</b><br><input data-h=${d} value="${H[d][0]}" size=11 placeholder="10:00, 18:00"> <input data-n=${d} type=number min=0 max=6 value=${H[d][1]} style="width:52px" title="Salidas por horario"></div>`).join('');
-let ROWS=[];
-const fmt=d=>d.toLocaleDateString('es-CL',{weekday:'long',day:'2-digit'}).toUpperCase();
-const pick=(arr,u,l)=>arr.sort((a,b)=>(u[a.id]||0)-(u[b.id]||0)||(l[a.id]??-1)-(l[b.id]??-1))[0];
+let ROWS=[],MES='',WK=[],cur=0;
+const iso=d=>d.toLocaleDateString('sv'),P=s=>{const[a,b,c]=s.split('-');return new Date(a,b-1,c)};
+const mon=s=>{const x=P(s);x.setDate(x.getDate()-((x.getDay()+6)%7));return iso(x)};
+const hist=()=>DB.historial||(DB.historial={});
+const mname=k=>{const[a,b]=k.split('-');return new Date(a,b-1,1).toLocaleDateString('es-CL',{month:'long',year:'numeric'})};
+const prevKey=m=>{const[a,b]=m.split('-').map(Number);return iso(new Date(a,b-2,1)).slice(0,7)};
+const dabbr=a=>ORDEN.filter(d=>a.includes(d)).map(d=>DIAS[d].slice(0,2)).join(' ');
+function usage(ex){const c={},h={};for(const[k,v]of Object.entries(hist())){if(k==ex)continue;for(const r of v.rows){if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;}}return[c,h];}
+function counts(){const[c,h]=usage(MES);ROWS.forEach(r=>{if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;});return[c,h];}
+const best=(a,sc,l)=>a.map(x=>[x,sc(x)]).sort((p,q)=>p[1]-q[1]||(l[p[0].id]??-1)-(l[q[0].id]??-1))[0]?.[0];
 
 function gen(){
- document.querySelectorAll('[data-h]').forEach(i=>{H[i.dataset.h]=[i.value,H[i.dataset.h][1]];});
- document.querySelectorAll('[data-n]').forEach(i=>{H[i.dataset.n][1]=+i.value;});
+ document.querySelectorAll('[data-h]').forEach(i=>H[i.dataset.h][0]=i.value);
+ document.querySelectorAll('[data-n]').forEach(i=>H[i.dataset.n][1]=+i.value);
  localStorage.setItem('pj_hor',JSON.stringify(H));
- const p=s=>{const[a,b,c]=s.split('-');return new Date(a,b-1,c);};
- let d=p($('#d1').value);const end=p($('#d2').value);
- const uC={},lC={},uH={},lH={};let i=0;ROWS=[];
- for(;d<=end;d.setDate(d.getDate()+1),i++){
-  const dow=d.getDay(),[hs,n]=H[dow],date=new Date(d),hUsed=new Set();
+ const[y,m]=MES.split('-').map(Number),L=hist()[prevKey(MES)]?.rows||[];
+ const lc=new Set(L.map(r=>r.c)),lcd=new Set(L.map(r=>r.c+'|'+P(r.f).getDay())),lhd=new Set(L.map(r=>r.h+'|'+P(r.f).getDay())),lp=new Set(L.map(r=>r.c+'|'+r.h));
+ const[uC,uH]=usage(MES),lC={},lH={};ROWS=[];let i=0;
+ for(let d=new Date(y,m-1,1);d.getMonth()==m-1;d.setDate(d.getDate()+1),i++){
+  const dow=d.getDay(),[hs,n]=H[dow],hUsed=new Set();
   for(const hora of hs.split(',').map(s=>s.trim()).filter(Boolean)){
    const t=hora<'14:00'?'M':'T',cUsed=new Set();
    for(let g=1;g<=n;g++){
-    const c=pick(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!cUsed.has(x.id)),uC,lC);
-    const h=pick(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!hUsed.has(x.id)),uH,lH);
+    const c=best(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!cUsed.has(x.id)),x=>(uC[x.id]||0)*4+(lcd.has(x.id+'|'+dow)?6:lc.has(x.id)?2:0),lC);
+    const h=best(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!hUsed.has(x.id)),x=>(uH[x.id]||0)*4+(lhd.has(x.id+'|'+dow)?6:0)+(c&&lp.has(c.id+'|'+x.id)?8:0),lH);
     if(c){cUsed.add(c.id);uC[c.id]=(uC[c.id]||0)+1;lC[c.id]=i;}
     if(h){hUsed.add(h.id);uH[h.id]=(uH[h.id]||0)+1;lH[h.id]=i;}
-    ROWS.push({date,hora,g:n>1?g:0,c:c?.id,h:h?.id});
+    ROWS.push({id:uid(),f:iso(d),hora,g:n>1?g:0,c:c?.id||'',h:h?.id||'',terr:c?.terr||''});
    }
   }
  }
- render();
+ cur=0;render();$('#st').textContent='Programa generado, sin guardar. Revísalo y edita lo que haga falta.';
 }
-const opts=(a,sel)=>`<option value="">— sin asignar —</option>`+a.map(x=>`<option value=${x.id} ${x.id==sel?'selected':''}>${esc(x.nombre)}</option>`).join('');
+function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();$('#st').textContent='Mes guardado en el historial.';}
+
+const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),a=P(k),b=new Date(a);b.setDate(a.getDate()+6);const lo=new Date(y,m-1,1),hi=new Date(y,m,0),x=a<lo?lo:a,e=b>hi?hi:b;
+ return x.toLocaleDateString('es-CL',{day:'numeric'})+' al '+e.toLocaleDateString('es-CL',{day:'numeric',month:s?'short':'long'});};
+const wrows=k=>ROWS.filter(r=>mon(r.f)==k).sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)||a.g-b.g);
+const grp=(l,a,sel,u,fl)=>a.length?`<optgroup label="${l}">${a.map(x=>`<option value="${x.id}" ${x.id==sel?'selected':''}>${esc(x.nombre)} · ${u[x.id]||0}×${fl&&fl.has(x.id)?' ↺':''}</option>`).join('')}</optgroup>`:'';
+function sel(f,r,list,ok,u,fl,cur0){
+ const okS=[...ok].sort((a,b)=>(u[a.id]||0)-(u[b.id]||0)),rest=list.filter(x=>!ok.includes(x));
+ return `<select data-r=${r.id} data-f=${f}><option value="">— sin asignar —</option>${grp('✓ Recomendados (disponibles ese día)',okS,cur0,u,fl)}${grp('Otros',rest,cur0,u,fl)}</select>`;
+}
+function weekHtml(k,i,uC,uH){
+ const rows=wrows(k),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
+ const body=rows.map(r=>{
+  const dow=P(r.f).getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
+  const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
+  const first=r.f!=pd;pd=r.f;
+  return `<tr><td class=day>${first?P(r.f).toLocaleDateString('es-CL',{weekday:'long',day:'2-digit'}).toUpperCase():''}</td>
+  <td class=hr><input data-r=${r.id} data-f=hora value="${esc(r.hora)}">${r.g?`<small class=hint>Grupo ${r.g}</small>`:''}</td>
+  <td>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class=pt>${esc(h?.nombre||'')}</span><span class=hint>${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span></td>
+  <td>${sel('c',r,DB.casas,okC,uC,lastC,r.c)}<span class=pt>${esc(c?c.nombre+' — '+c.dir:'')}</span><span class=hint>${c?esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span></td>
+  <td class=hr><input data-r=${r.id} data-f=terr value="${esc(r.terr)}"></td><td class=noprint><button data-del=${r.id} title="Quitar fila">✕</button></td></tr>`;}).join('');
+ return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación</div>
+ <div class=wh><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2><span class=noprint><button data-add=${i}>+ Fila</button> <button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
+ <div class=tw><table><thead><tr><th>FECHA</th><th>HORA</th><th>ENCARGADO</th><th>LUGAR DE ENCUENTRO</th><th>TERRITORIOS</th><th class=noprint></th></tr></thead><tbody>${body||'<tr><td colspan=6>Sin salidas esta semana.</td></tr>'}</tbody></table></div></section>`;
+}
 function render(){
- $('#tit').textContent='Programa del '+(ROWS[0]?.date.toLocaleDateString('es-CL')||'')+' al '+(ROWS.at(-1)?.date.toLocaleDateString('es-CL')||'');
- $('#tb').innerHTML=ROWS.map((r,k)=>{
-  const c=DB.casas.find(x=>x.id==r.c);
-  return `<tr data-k=${k}><td>${fmt(r.date)}</td><td>${r.hora}${r.g?' <small>Grupo '+r.g+'</small>':''}</td>
-  <td><select data-s=h>${opts(DB.hermanos.filter(x=>x.grupo),r.h)}</select></td>
-  <td><select data-s=c>${opts(DB.casas,r.c)}</select>${c?`<small>${esc(c.dir)}</small>`:'<small class=warn>Sin casa disponible</small>'}</td>
-  <td>${esc(c?.terr||'')}</td></tr>`;}).join('');
+ const s=new Set(ROWS.map(r=>mon(r.f)));WK=[...s].sort();cur=Math.max(0,Math.min(cur,WK.length-1));
+ $('#tabs').innerHTML=WK.map((k,i)=>`<span class="chip ${i==cur?'on':''}" data-w=${i} tabindex=0>Sem ${i+1} · ${lab(k,1)}</span>`).join('');
+ const[uC,uH]=counts();
+ $('#weeks').innerHTML=WK.map((k,i)=>weekHtml(k,i,uC,uH)).join('')||'<section class="card"><small>Elige un mes para generar el programa.</small></section>';
+ const ks=Object.keys(hist()).sort().reverse();
+ $('#hist').innerHTML=ks.map(k=>`<div class=item><div><b>${mname(k)}</b> <small>${hist()[k].rows.length} salidas</small></div><button data-open=${k}>Abrir</button><button data-hd=${k} title="Eliminar del historial">✕</button></div>`).join('')||'<small>Aún no hay meses guardados.</small>';
+ const[hc,hh]=usage('__'),tb=(t,a,u)=>`<div><h3>${t}</h3><table>${[...a].sort((x,y)=>(u[x.id]||0)-(u[y.id]||0)).map(x=>`<tr><td>${esc(x.nombre)}</td><td>${u[x.id]||0}</td></tr>`).join('')}</table></div>`;
+ $('#uso').innerHTML=tb('Encargados · veces en historial',DB.hermanos.filter(x=>x.grupo),hh)+tb('Casas · veces en historial',DB.casas,hc);
 }
-$('#tb').onchange=e=>{const s=e.target.dataset.s;if(!s)return;ROWS[+e.target.closest('tr').dataset.k][s]=e.target.value;render();};
-$('#f').onsubmit=e=>{e.preventDefault();gen();};
-$('#pr').onclick=()=>print();
-const t=new Date(),m=new Date(t);m.setDate(t.getDate()+(8-t.getDay())%7||7);const e2=new Date(m);e2.setDate(m.getDate()+13);
-const iso=d=>d.toLocaleDateString('sv');$('#d1').value=iso(m);$('#d2').value=iso(e2);
-load().then(()=>toast(DB.casas.length+' casas · '+DB.hermanos.length+' hermanos'));
+const txt=i=>`Programa de predicación — Congregación Curauma\nSemana del ${lab(WK[i])}\n`+wrows(WK[i]).map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
+ return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
+$('#weeks').onchange=e=>{const t=e.target,r=ROWS.find(x=>x.id==t.dataset.r),f=t.dataset.f;if(!r)return;r[f]=t.value;
+ if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h')render();$('#st').textContent='Cambios sin guardar en el historial.';};
+document.addEventListener('click',async e=>{const d=e.target.dataset||{};
+ if(d.w!==undefined){cur=+d.w;render();}
+ if(d.del){ROWS=ROWS.filter(r=>r.id!=d.del);render();}
+ if(d.add!==undefined){const f=prompt('Fecha de la nueva fila (AAAA-MM-DD)',wrows(WK[d.add])[0]?.f||'');if(f)ROWS.push({id:uid(),f,hora:'10:00',g:0,c:'',h:'',terr:''});render();}
+ if(d.pdf!==undefined){document.body.classList.add('one');document.querySelectorAll('.wk').forEach((w,j)=>w.classList.toggle('pr',j==+d.pdf));print();}
+ if(d.send!==undefined){const t=txt(+d.send);if(navigator.share)navigator.share({title:'Programa de predicación',text:t}).catch(()=>{});else{navigator.clipboard?.writeText(t);open('https://wa.me/?text='+encodeURIComponent(t),'_blank');toast('Texto copiado');}}
+ if(d.open)openMonth(d.open);
+ if(d.hd&&confirm('¿Eliminar '+mname(d.hd)+' del historial?')){delete hist()[d.hd];localStorage.setItem('pj_hist',JSON.stringify(hist()));try{await save('Elimina '+d.hd);}catch(x){toast(x.message);}render();}
+});
+addEventListener('afterprint',()=>document.body.classList.remove('one'));
+$('#pm').onclick=()=>print();
+$('#sv').onclick=async()=>{if(!ROWS.length)return toast('Genera un mes primero');
+ hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{f:r.f,hora:r.hora,g:r.g,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr};})};
+ localStorage.setItem('pj_hist',JSON.stringify(hist()));
+ try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub)');}catch(e){toast('Guardado solo en este navegador: '+e.message);}
+ $('#st').textContent='Mes guardado en el historial.';render();};
+$('#f').onsubmit=e=>{e.preventDefault();MES=$('#mes').value;if(!MES)return;if(hist()[MES]&&!confirm('Este mes ya está guardado. ¿Regenerarlo desde cero?'))return openMonth(MES);gen();};
+$('#mes').onchange=()=>{MES=$('#mes').value;if(!MES)return;hist()[MES]?openMonth(MES):gen();};
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip'))e.target.click();});
+load().then(()=>{
+ const Lc=JSON.parse(localStorage.getItem('pj_hist')||'{}');for(const k in Lc)if(!hist()[k])hist()[k]=Lc[k];
+ const n=new Date();n.setMonth(n.getMonth()+1,1);MES=iso(n).slice(0,7);$('#mes').value=MES;
+ hist()[MES]?openMonth(MES):gen();
+});
 </script></body></html>
