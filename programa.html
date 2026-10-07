@@ -69,6 +69,13 @@ tr.cont td{padding-top:4px}
 .pl{display:inline-flex;gap:6px;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card);cursor:pointer;margin:0 4px 5px 0}.pl em{font:600 11px var(--mono);font-style:normal;color:var(--soft)}
 .pl.ok{border-color:var(--brand);color:var(--brand)}.pl.no{border-color:var(--bad);color:var(--bad)}.pl.pe{border-color:var(--gold);color:var(--gold)}
 .mbar{display:grid;grid-template-columns:120px 1fr 90px;gap:10px;align-items:center;margin:7px 0;font-size:12.5px;cursor:pointer;text-transform:capitalize}.mbar>i{display:block;height:10px;border-radius:99px;background:var(--bad-bg);overflow:hidden}.mbar>i>u{display:block;height:100%;background:var(--brand)}.mbar small{text-transform:none}
+.mbar{padding:7px 10px;border-radius:10px;border:1px solid transparent}.mbar:hover{background:var(--fill)}.mbar.sel{background:var(--fill);border-color:var(--brand)}.mbar.sel>span:first-child{font-weight:700}
+.edet{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+.eh{display:flex;flex-wrap:wrap;gap:8px 24px;align-items:center;margin-bottom:14px}.eh .big{font:600 42px/1 var(--serif)}.eh .lb{display:block;font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-top:5px}
+.cnt{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;font-weight:600}.cnt .ok{color:var(--brand)}.cnt .no{color:var(--bad)}.cnt .pe{color:var(--gold)}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.rk{background:var(--fill);border-radius:12px;padding:12px 14px}.rk h3{margin:0 0 6px}
+.rkr{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line);cursor:pointer;font-size:13.5px}.rkr:last-of-type{border-bottom:0}.rkr .n{font:600 11px var(--mono);color:var(--soft)}.rkr .v{font-weight:700;white-space:nowrap}.rkr .v.ok{color:var(--brand)}.rkr .v.no{color:var(--bad)}.rkr em{font-style:normal;font-weight:400;color:var(--soft);font-size:11.5px}
+.eact{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .dayrow{display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}.dayrow:last-child{border-bottom:0}.dayrow b{min-width:120px;text-transform:capitalize}
 .tag.bad{background:var(--bad-bg);color:var(--bad)}.tag.gold{background:var(--gold-bg);color:var(--gold)}
 </style></head><body>
@@ -91,16 +98,13 @@ tr.cont td{padding-top:4px}
 <div id="tabs" class="fl noprint"></div>
 <div id="weeks"></div>
 <section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><p class="hint">Archivo de meses guardados. Abre uno para revisarlo; el mes anterior se usa para no repetir asignaciones.</p><div id="hist"></div></section>
-<section class="card noprint" id="seg"><span class="eyebrow">Seguimiento</span><h2>Cumplimiento de asignaciones</h2><p class="hint">Elige un mes guardado y marca si cada hermano cumplió su salida o no. Si falló, puedes indicar quién lo reemplazó. Al terminar pulsa «Guardar seguimiento».</p>
+<section class="card noprint" id="seg"><span class="eyebrow">Seguimiento</span><h2>Cumplimiento de asignaciones</h2><p class="hint">Elige un mes y una semana, y marca si cada hermano cumplió su salida o no. Si falló, puedes indicar quién lo reemplazó. Al terminar pulsa «Guardar seguimiento».</p>
  <div id="smo" class="fl"></div>
+ <div id="swk" class="fl" style="margin-top:8px"></div>
  <div id="sbar" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 12px"></div>
  <div id="stb"></div></section>
-<section class="card noprint" id="est"><span class="eyebrow">Estadísticas</span><h2>Centro de estadísticas</h2><p class="hint">Resumen general con filtros: elige período, rango y resultado para ver quiénes cumplieron, quiénes fallaron y quiénes están pendientes. Toca un nombre para abrir su ficha.</p>
- <div class="frow"><span class="fl-l">Período</span><div class="fl" id="f_per"></div></div>
- <div class="frow"><span class="fl-l">Rango</span><div class="fl" id="f_rg"></div></div>
- <div class="frow"><span class="fl-l">Ver</span><div class="fl" id="f_res"></div></div>
- <div id="e_kp"></div><div class="pie" id="e_pie"></div><div class="cols3" id="e_lists"></div>
- <h3 style="margin-top:24px">Cumplimiento por mes</h3><div id="e_mes"></div></section>
+<section class="card noprint" id="est"><span class="eyebrow">Estadísticas</span><h2>Cumplimiento por mes</h2><p class="hint">Toca un mes para ver quiénes cumplieron más y quiénes fallaron más.</p>
+ <div id="e_mes"></div><div id="e_det"></div></section>
 <section class="card noprint" id="fic"><span class="eyebrow">Ficha</span><h2>Ficha por hermano</h2><p class="hint">Escribe o elige un nombre para ver su historial de cumplimiento, útil cuando alguien reclama que no lo pusieron en el programa.</p>
  <form onsubmit="return false"><input id="fbIn" list="fbList" placeholder="Nombre del hermano…" style="flex:1 1 240px"><datalist id="fbList"></datalist><button type="button" id="fbClr" class="ghost">Limpiar</button></form>
  <div class="grid" id="fres"></div></section>
@@ -302,12 +306,12 @@ $('#editModeBtn').onclick=()=>{
  if(EM&&MES&&!ROWS.length)gen();else render();
  toast(EM?'Modo edición activado — puedes editar el programa':'Modo edición desactivado',EM?'ok':'');
 };
-document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip'))e.target.click();});
+document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.matches&&e.target.matches('.chip,.mbar,.rkr'))e.target.click();});
 
 /* ---------- Seguimiento y estadísticas ---------- */
 const RGN=[['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']];
 const rkOf=b=>{const t=((b&&b.tarea)||'').split('/').map(x=>x.trim().toUpperCase());return t.includes('AN')?'AN':t.includes('SM')?'SM':t.some(x=>x.startsWith('PR')||x=='PE'||x=='PA')?'PRE':'PUB';};
-let SK='',SF={per:'mes',rg:'',res:''},FB='',sdirty=false;
+let SK='',SW=null,ES='',ESALL=false,FB='',sdirty=false;
 const bro=id=>DB.hermanos.find(x=>x.id==id),bname=r=>bro(r.h)?.nombre||r.hn||'—',bn2=id=>bro(id)?.nombre||'—';
 const fdate=f=>P(f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'short'});
 const skey=()=>{const ks=Object.keys(hist()).sort();if(!hist()[SK])SK=hist()[MES]?MES:ks[ks.length-1]||'';return SK;};
@@ -333,33 +337,44 @@ function setSt(id,p){
 }
 addEventListener('beforeunload',e=>{if(sdirty){e.preventDefault();e.returnValue='';}});
 
+const wlab=(k,m)=>{const[y,mo]=m.split('-').map(Number),e=k==3?new Date(y,mo,0).getDate():k*7+7;return (k*7+1)+'–'+e;};
+function autoWeek(k,W,today){
+ if(k&&k==today.slice(0,7))return Math.min(3,Math.floor((+today.slice(8)-1)/7));
+ const i=W.findIndex(rs=>rs.some(r=>!r.st&&r.f<=today));if(i>=0)return i;
+ const j=W.findIndex(rs=>rs.length);return j>=0?j:0;
+}
 function segRender(){
  const ks=Object.keys(hist()).sort().reverse(),k=skey();
  $('#smo').innerHTML=ks.length?chipsH(ks.map(m=>[m,mname(m)]),k,'smo'):'<small>Aún no hay meses guardados. Guarda un programa en el historial para hacer su seguimiento.</small>';
- const rows=k?hist()[k].rows.filter(r=>r.h).slice().sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)):[],today=iso(new Date());
+ const all=k?hist()[k].rows.filter(r=>r.h).slice().sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)):[],today=iso(new Date());
+ const W=[0,1,2,3].map(i=>all.filter(r=>wk(r)==i));
+ if(SW===null||SW<0||SW>3)SW=autoWeek(k,W,today);
+ $('#swk').innerHTML=k&&all.length?chipsH(W.map((rs,i)=>[i,`Sem ${i+1} · ${wlab(i,k)} · ${rs.filter(r=>r.st).length}/${rs.length}`]),SW,'sw'):'';
+ const rows=W[SW]||[];
  const ok=rows.filter(r=>r.st=='ok').length,no=rows.filter(r=>r.st=='no').length,pe=rows.length-ok-no;
- $('#sbar').innerHTML=k?`<span class=bd>${ok} ✓</span><span class=bd>${no} ✕</span><span class=bd>${pe} pendientes</span><span class=sp></span>${AUTH?`<button data-bulk=1 title="Marca como cumplidas las salidas pendientes hasta hoy">Marcar pendientes como cumplidos</button><button class=pri id=ssv ${sdirty?'':'disabled'}>Guardar seguimiento</button>`:'<small>🔒 Solo lectura · para marcar necesitas edición habilitada</small>'}`:'';
+ $('#sbar').innerHTML=k&&all.length?`<span class=bd>${ok} ✓</span><span class=bd>${no} ✕</span><span class=bd>${pe} pendientes</span><span class=sp></span>${AUTH?`<button data-bulk=1 title="Marca como cumplidas las salidas pendientes de esta semana hasta hoy">Marcar pendientes como cumplidos</button><button class=pri id=ssv ${sdirty?'':'disabled'}>Guardar seguimiento</button>`:'<small>🔒 Solo lectura · para marcar necesitas edición habilitada</small>'}`:'';
  const opts=r=>DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.id!=r.h).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(x=>`<option value="${x.id}" ${x.id==r.rp?'selected':''}>${esc(x.nombre)}</option>`).join('');
  $('#stb').innerHTML=rows.length?`<div class=table-wrap><table><thead><tr><th>Fecha</th><th>Hora</th><th>Encargado</th><th>Lugar</th><th>Resultado</th></tr></thead><tbody>${rows.map(r=>{
   const st=r.st=='ok'?'<span class="tag active">✓ Cumplió</span>':r.st=='no'?'<span class="tag bad">✕ No cumplió</span>':'<span class="tag gold">Pendiente</span>';
   const ctl=AUTH?`<div class=sb><button class="small ${r.st=='ok'?'on-ok':''}" data-sk="${r.id}|ok">✓ Cumplió</button><button class="small ${r.st=='no'?'on-no':''}" data-sk="${r.id}|no">✕ No cumplió</button>${r.st?`<button class="small ghost" data-sk="${r.id}|" title="Volver a pendiente">↺</button>`:''}</div>${r.st=='no'?`<div class=rpl><select data-rp="${r.id}"><option value="">— Reemplazo (opcional) —</option>${opts(r)}</select><input data-nt="${r.id}" placeholder="Nota (opcional)" value="${esc(r.nt||'')}"></div>`:''}`:st+(r.st=='no'&&(r.rp||r.nt)?`<span class=cap>${r.rp?'Reemplazo: '+esc(bn2(r.rp)):''}${r.nt?' · '+esc(r.nt):''}</span>`:'');
-  return `<tr><td data-label="Fecha"><b style="text-transform:capitalize">${fdate(r.f)}</b>${r.f>today?' <span class=mut>(próxima)</span>':''}</td><td data-label="Hora"><span class=hv>${esc(r.hora)}</span></td><td data-label="Encargado"><b>${esc(bname(r))}</b></td><td data-label="Lugar">${esc(r.cn||DB.casas.find(x=>x.id==r.c)?.nombre||'—')}</td><td data-label="Resultado">${ctl}</td></tr>`;}).join('')}</tbody></table></div>`:(k?'<small>Este mes no tiene salidas con encargado.</small>':'');
+  return `<tr><td data-label="Fecha"><b style="text-transform:capitalize">${fdate(r.f)}</b>${r.f>today?' <span class=mut>(próxima)</span>':''}</td><td data-label="Hora"><span class=hv>${esc(r.hora)}</span></td><td data-label="Encargado"><b>${esc(bname(r))}</b></td><td data-label="Lugar">${esc(r.cn||DB.casas.find(x=>x.id==r.c)?.nombre||'—')}</td><td data-label="Resultado">${ctl}</td></tr>`;}).join('')}</tbody></table></div>`:(k?(all.length?'<small>Esta semana no tiene salidas con encargado.</small>':'<small>Este mes no tiene salidas con encargado.</small>'):'');
 }
 function estRender(){
- $('#f_per').innerHTML=chipsH([['mes',skey()?mname(skey()):'Mes'],['all','Todo el historial']],SF.per,'sper');
- $('#f_rg').innerHTML=chipsH(RGN,SF.rg,'srg');
- $('#f_res').innerHTML=chipsH([['','Todos'],['ok','✓ Cumplieron'],['no','✕ Fallaron'],['pe','Pendientes']],SF.res,'sres');
- const its=pool(SF.per).filter(({r})=>!SF.rg||rkOf(bro(r.h))==SF.rg),A={};
- let ok=0,no=0,pe=0;
- its.forEach(({r})=>{const a=A[r.h]||(A[r.h]={id:r.h,n:bname(r),ok:0,no:0,pe:0}),s=r.st=='ok'?'ok':r.st=='no'?'no':'pe';a[s]++;s=='ok'?ok++:s=='no'?no++:pe++;});
- $('#e_kp').innerHTML=kpis(its.length,ok,no,pe);
- $('#e_pie').innerHTML=its.length?pie(ok,no,pe)+legend(ok,no,pe):'<small>No hay asignaciones con estos filtros.</small>';
- const L=[['ok','✓ Cumplieron'],['no','✕ Fallaron'],['pe','Pendientes']].filter(x=>!SF.res||SF.res==x[0]);
- $('#e_lists').innerHTML=L.map(([key,t])=>{const l=Object.values(A).filter(a=>a[key]).sort((a,b)=>b[key]-a[key]||a.n.localeCompare(b.n));
-  return `<div><h3>${t} · ${l.length}</h3>${l.length?l.map(a=>`<span class="pl ${key}" data-fb="${a.id}" tabindex=0>${esc(a.n)}<em>${a[key]}</em></span>`).join(''):'<small>Nadie</small>'}</div>`;}).join('');
  const ms=Object.keys(hist()).sort().reverse();
- $('#e_mes').innerHTML=ms.map(k=>{let o=0,n=0,p=0;hist()[k].rows.filter(r=>r.h&&(!SF.rg||rkOf(bro(r.h))==SF.rg)).forEach(r=>r.st=='ok'?o++:r.st=='no'?n++:p++);const c=pct(o,n);
-  return `<div class=mbar data-smo2="${k}" title="Abrir seguimiento de este mes"><span>${mname(k)}</span><i><u style="width:${c||0}%"></u></i><span><b>${c===null?'—':c+'%'}</b> <small>${o}✓ ${n}✕ ${p}…</small></span></div>`;}).join('')||'<small>Sin meses guardados.</small>';
+ if(!ms.length){$('#e_mes').innerHTML='<small>Sin meses guardados.</small>';$('#e_det').innerHTML='';return;}
+ if(!ES||!hist()[ES])ES=hist()[skey()]?skey():ms[0];
+ $('#e_mes').innerHTML=ms.map(k=>{let o=0,n=0,p=0;hist()[k].rows.filter(r=>r.h).forEach(r=>r.st=='ok'?o++:r.st=='no'?n++:p++);const c=pct(o,n);
+  return `<div class="mbar ${k==ES?'sel':''}" data-emes="${k}" tabindex=0 role=button aria-pressed="${k==ES}"><span>${mname(k)}</span><i><u style="width:${c||0}%"></u></i><span><b>${c===null?'—':c+'%'}</b></span></div>`;}).join('');
+ const A={};let ok=0,no=0,pe=0;
+ hist()[ES].rows.filter(r=>r.h).forEach(r=>{const a=A[r.h]||(A[r.h]={id:r.h,n:bname(r),ok:0,no:0,pe:0}),s=r.st=='ok'?'ok':r.st=='no'?'no':'pe';a[s]++;s=='ok'?ok++:s=='no'?no++:pe++;});
+ const c=pct(ok,no),vals=Object.values(A);
+ const lst=key=>vals.filter(a=>a[key]).sort((a,b)=>b[key]-a[key]||(key=='ok'?a.no-b.no:a.ok-b.ok)||a.n.localeCompare(b.n));
+ const box=(key,t,ico,vacio)=>{const l=lst(key),sh=ESALL?l:l.slice(0,5);
+  return `<div class=rk><h3>${t}</h3>${sh.length?sh.map((a,i)=>`<div class=rkr data-fb="${a.id}" tabindex=0><span class=n>${i+1}</span><span>${esc(a.n)}</span><span class="v ${key}">${a[key]} ${ico}<em> de ${a.ok+a.no+a.pe}</em></span></div>`).join(''):`<small>${vacio}</small>`}</div>`;};
+ const more=lst('ok').length>5||lst('no').length>5;
+ $('#e_det').innerHTML=`<div class=edet><div class=eh><div><b class=big>${c===null?'—':c+'%'}</b><span class=lb>Cumplimiento · ${mname(ES)}</span></div><div class=cnt><span class=ok>${ok} cumplieron</span><span class=no>${no} fallaron</span><span class=pe>${pe} pendientes</span></div></div>
+  <div class=cols2>${box('ok','✓ Quienes más cumplieron','✓','Aún nadie ha cumplido este mes')}${box('no','✕ Quienes más fallaron','✕','Nadie ha fallado 🎉')}</div>
+  <div class=eact>${more?`<span class="chip" data-eall=1 tabindex=0>${ESALL?'Ver menos':'Ver todos'}</span>`:''}<button class="small ghost" data-goseg=1>Ir al seguimiento de este mes</button></div></div>`;
 }
 function ficRender(){
  const ids=new Set();Object.values(hist()).forEach(v=>v.rows.forEach(r=>{if(r.h)ids.add(r.h);}));DB.hermanos.filter(x=>x.grupo).forEach(x=>ids.add(x.id));
@@ -380,17 +395,18 @@ function ficRender(){
 }
 function segAll(){segRender();estRender();ficRender();}
 $('#seg').addEventListener('click',e=>{const d=e.target.dataset||{};
- if(d.smo){SK=d.smo;segAll();}
+ if(d.smo){SK=d.smo;SW=null;segAll();}
+ if(d.sw!==undefined){SW=+d.sw;segAll();}
  if(d.sk&&AUTH){const[id,v]=d.sk.split('|');setSt(id,v?{st:v}:{st:'',rp:'',nt:''});}
- if(d.bulk&&AUTH){const t=iso(new Date());let n=0;(hist()[skey()]?.rows||[]).forEach(r=>{if(r.h&&!r.st&&r.f<=t){r.st='ok';n++;const q=ROWS.find(x=>x.id==r.id);if(q)q.st='ok';}});if(n){localStorage.setItem('pj_hist',JSON.stringify(hist()));sdirty=true;segAll();toast(n+' marcadas como cumplidas');}else toast('No hay pendientes hasta hoy');}
+ if(d.bulk&&AUTH){const t=iso(new Date());let n=0;(hist()[skey()]?.rows||[]).forEach(r=>{if(r.h&&wk(r)==SW&&!r.st&&r.f<=t){r.st='ok';n++;const q=ROWS.find(x=>x.id==r.id);if(q)q.st='ok';}});if(n){localStorage.setItem('pj_hist',JSON.stringify(hist()));sdirty=true;segAll();toast(n+' marcadas como cumplidas');}else toast('No hay pendientes hasta hoy en esta semana');}
  if(e.target.id=='ssv'){(async()=>{try{await save('Seguimiento '+skey());sdirty=false;toast('Seguimiento guardado ✓','ok');}catch(x){toast('Solo guardado en este navegador: '+x.message,'err');}segAll();})();}
 });
 $('#seg').addEventListener('change',e=>{const d=e.target.dataset||{};if(!AUTH)return;if(d.rp!==undefined)setSt(d.rp,{rp:e.target.value});if(d.nt!==undefined)setSt(d.nt,{nt:e.target.value.trim()});});
-$('#est').addEventListener('click',e=>{const el=e.target.closest('[data-sper],[data-srg],[data-sres],[data-fb],[data-smo2]');if(!el)return;const d=el.dataset;
- if(d.sper)SF.per=d.sper;else if(d.srg!==undefined)SF.rg=d.srg;else if(d.sres!==undefined)SF.res=d.sres;
- else if(d.fb){FB=d.fb;$('#fbIn').value=bn2(FB);ficRender();$('#fic').scrollIntoView({behavior:'smooth'});return;}
- else if(d.smo2){SK=d.smo2;segAll();$('#seg').scrollIntoView({behavior:'smooth'});return;}
- estRender();});
+$('#est').addEventListener('click',e=>{const el=e.target.closest('[data-emes],[data-fb],[data-eall],[data-goseg]');if(!el)return;const d=el.dataset;
+ if(d.emes){ES=d.emes;ESALL=false;estRender();return;}
+ if(d.eall!==undefined){ESALL=!ESALL;estRender();return;}
+ if(d.goseg!==undefined){SK=ES;SW=null;segAll();$('#seg').scrollIntoView({behavior:'smooth'});return;}
+ if(d.fb){FB=d.fb;$('#fbIn').value=bn2(FB);ficRender();$('#fic').scrollIntoView({behavior:'smooth'});}});
 $('#fbIn').oninput=e=>{const v=e.target.value.trim().toLowerCase(),h=DB.hermanos.find(x=>x.nombre.toLowerCase()==v);if(h){FB=h.id;ficRender();}};
 $('#fbClr').onclick=()=>{FB='';$('#fbIn').value='';ficRender();};
 
