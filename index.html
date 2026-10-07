@@ -14,9 +14,12 @@
  <section class="card"><span class="eyebrow">Grupos</span><h2>Varones disponibles <span class="badge" id="nv"></span></h2>
   <p class="sub">Quién puede sacar grupo, según rango, día y turno.</p>
   <input id="q2" type="search" placeholder="Buscar hermano…" aria-label="Buscar hermano">
+  <div class="vbar">
+  <div class="frow"><span class="fl-l">Grupo</span><div class="fl" id="fvg"></div></div>
   <div class="frow"><span class="fl-l">Rango</span><div class="fl" id="fvr"></div></div>
   <div class="frow"><span class="fl-l">Día</span><div class="fl" id="fvd"></div></div>
   <div class="frow"><span class="fl-l">Turno</span><div class="fl" id="fvt"></div></div>
+  </div>
   <div id="lv0"></div></section>
 </div>
 
@@ -44,7 +47,7 @@
 <script src="app.js"></script>
 <script>
 shell('i');
-let AUTH=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',q1='',q2='';
+let AUTH=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
 const TN={MT:'Mañana y tarde',M:'Mañana',T:'Tarde'};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=d value=${d} ${d>0?'checked':''}>${DIAS[d].slice(0,3)}</label>`).join('');
@@ -57,19 +60,26 @@ const isPre=s=>s.startsWith('PR')||s=='PE'||s=='PA';
 const rk=x=>{const t=(x.tarea||'').split('/').map(s=>s.trim().toUpperCase()),an=t.includes('AN'),sm=t.includes('SM'),pre=t.some(isPre);return{AN:an,SM:sm,PRE:pre,PUB:!an&&!sm&&!pre,main:an?'AN':sm?'SM':pre?'PRE':'PUB'};};
 const chips=(arr,cur,a)=>arr.map(([v,l])=>`<span class="chip ${cur==v?'on':''}" data-${a}="${v}" tabindex=0>${l}</span>`).join('');
 const TURNOS=[['','Todos'],['M','☀ Mañana'],['T','🌙 Tarde']];
-const dtxt=x=>ORDEN.every(d=>x.dias.includes(d))?'Todos los días':ORDEN.filter(d=>x.dias.includes(d)).map(d=>DIAS[d].slice(0,3)).join(', ');
-const ttxt=x=>TN[x.turno]||TN.MT;
+function vcard(x){
+ const r=rk(x).main,days=ORDEN.filter(d=>x.dias.includes(d)),one=fv>=0&&days.includes(fv);
+ const big=!days.length?'<div class="vday none">Sin día asignado</div>':`<span class=lb>${one||days.length==1?'Día disponible':'Días disponibles'}</span><div class=vday>${one?DIAS[fv]:days.length==7?'Todos los días':days.map(d=>DIAS[d].slice(0,3)).join(' · ')}</div>`;
+ return `<article class=vm><div class=vt><b class=vn>${esc(x.nombre)}</b><span class="bd rk-${r}">${rango(x.tarea)}</span></div>
+  <div>${big}</div>
+  <div class=vf><div class=vj>${turnoOk(x.turno,'M')?'<span class=bd>☀️ Mañana</span>':''}${turnoOk(x.turno,'T')?'<span class=bd>🌙 Tarde</span>':''}</div>
+  <span class="lg ${x.grupo?'si':'no'}">${x.grupo?'✓ Saca grupo: Sí':'✕ Saca grupo: No'}</span></div></article>`;
+}
 function cards(){
  const D=[['-1','Todos']].concat(ORDEN.map(d=>[String(d),DIAS[d].slice(0,3)]));
  $('#fcd').innerHTML=chips(D,fd,'fd');$('#fvd').innerHTML=chips(D,fv,'fv');
  $('#fct').innerHTML=chips(TURNOS,ft,'ft');$('#fvt').innerHTML=chips(TURNOS,fvt,'fvt');
+ $('#fvg').innerHTML=chips([['','Todos'],['si','Saca grupo']],fgp,'fg');
  $('#fvr').innerHTML=chips([['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']],fr,'fr');
  const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase(),ord={AN:0,SM:1,PRE:2,PUB:3};
  const C=DB.casas.filter(x=>(AUTH||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
- const V=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ord[rk(a).main]-ord[rk(b).main]||a.nombre.localeCompare(b.nombre));
+ const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ord[rk(a).main]-ord[rk(b).main]||a.nombre.localeCompare(b.nombre));
  $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
  $('#lc0').innerHTML=(AUTH?'<p class=sub style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${AUTH?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
- $('#lv0').innerHTML=V.length?`<div class=cg>${V.map(x=>`<details class="vc r-${rk(x).main}"><summary><div class=vh><b>${esc(x.nombre)}</b><span class="tag rg">${rango(x.tarea)}</span></div><span class=vs>${dtxt(x)} · ${ttxt(x)}</span></summary><div class=vi><div><span class=lb>Días en que puede</span><div class=dl>${ORDEN.map(d=>`<span class="${x.dias.includes(d)?'on':''} ${d==fv?'sel':''}">${DIAS[d].slice(0,2)}</span>`).join('')}</div></div><div><span class=lb>Turno</span><span>${ttxt(x)}</span></div></div></details>`).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
+ $('#lv0').innerHTML=V.length?`<div class=vgrid>${V.map(vcard).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
 function item(k,x){
  const h=k=='hermanos',g=!h||x.grupo;
@@ -97,7 +107,7 @@ $('#fc').onsubmit=e=>add(e,'casas');$('#fh').onsubmit=e=>add(e,'hermanos');
 const find=el=>{const it=el.closest('.item');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
 document.addEventListener('click',e=>{
  const ds=e.target.dataset||{};
- if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}
+ if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}
  const r=find(e.target);if(!r||!AUTH)return;const [arr,x]=r;
  if(ds.d!==undefined){const d=+ds.d;x.dias=x.dias.includes(d)?x.dias.filter(v=>v!=d):[...x.dias,d];render();dirty();}
  if(ds.del!==undefined&&confirm('¿Eliminar '+x.nombre+'?')){arr.splice(arr.indexOf(x),1);render();dirty();}
