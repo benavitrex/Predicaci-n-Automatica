@@ -19,6 +19,8 @@ td.hr .tag{margin-top:5px;display:block;width:max-content}
 td b{font-weight:600}.cap{display:block;font-size:12px;color:var(--soft);margin-top:3px;line-height:1.4}
 td select,td input.ed{width:100%}td input.ed.hora{width:92px;font:600 14px var(--mono)}td input.ed.terr{width:84px;text-align:center;font:600 13px var(--mono)}
 td .tag{font-size:11.5px}
+.fer{display:block;font:italic 500 11px/1.2 Inter,sans-serif;color:var(--gold);margin-top:4px;letter-spacing:.01em}
+.gsb{display:block;width:max-content;margin-top:6px}
 tr.more td{border-bottom-color:transparent;padding-bottom:4px}
 tr.cont td{padding-top:4px}
 @media screen and (max-width:680px){
@@ -40,6 +42,7 @@ tr.cont td{padding-top:4px}
  tbody tr.more td:not(:last-child){border-bottom:1px dashed var(--line)}
 }
 @media print{
+ .fer{color:#666}
  .ph{display:block;text-align:center;margin-bottom:10px;font-size:15px}
  .ed,.noprint,.cap.ed{display:none!important}
  table.em .tx{display:block!important}
@@ -64,7 +67,9 @@ tr.cont td{padding-top:4px}
   <button type="button" id="pm" class="ghost">🖨️ Imprimir mes</button>
  </form>
  <p class="hint" id="gh" hidden style="margin:0"><b>Generar</b>: agrega las salidas que falten (por ejemplo, tras marcar la tarde en otro día) sin tocar lo que ya editaste. <b>Regenerar todo el mes</b>: borra el programa en pantalla y lo arma de nuevo desde cero.</p>
- <details id="hd" hidden><summary>Horarios por día (hora y salidas por horario)</summary><p class="hint" style="margin:6px 0 0">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</p><div id="hor" class="hg"></div></details>
+ <details id="hd" hidden><summary>Horarios por día (hora y salidas por horario)</summary><p class="hint" style="margin:6px 0 0">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</p><div id="hor" class="hg"></div>
+  <div class="hg" style="margin-top:14px"><div><b>Sábados por grupos</b><p class="hint" style="margin:4px 0 8px">Esos sábados se sale por grupo (Grupo 1 al 5, cada uno con su encargado y su casa). Se aplican al generar; para cambiar un mes ya armado usa «Regenerar todo el mes» o el botón de cada sábado.</p><div id="gsc" style="display:flex;flex-wrap:wrap;gap:6px 14px"></div></div>
+  <div><b>Feriados extra</b><p class="hint" style="margin:4px 0 8px">Los feriados de Chile ya vienen incluidos. Si falta alguno (elecciones, feriado especial), escribe la fecha AAAA-MM-DD separadas por coma.</p><input id="fx" placeholder="2026-11-16, 2026-12-31" style="width:100%"></div></div></details>
 </section>
 <div id="mh" class="mh noprint"></div>
 <div id="tabs" class="fl noprint"></div>
@@ -92,6 +97,31 @@ const iso=d=>d.toLocaleDateString('sv'),P=s=>{const[a,b,c]=s.split('-');return n
 const hist=()=>DB.historial||(DB.historial={});
 const mname=k=>{const[a,b]=k.split('-');return new Date(a,b-1,1).toLocaleDateString('es-CL',{month:'long',year:'numeric'})};
 const prevKey=m=>{const[a,b]=m.split('-').map(Number);return iso(new Date(a,b-2,1)).slice(0,7)};
+/* ---------- Feriados de Chile ---------- */
+const FERC={};
+function ferYear(y){
+ if(FERC[y])return FERC[y];
+ const m={},dt=(mm,dd)=>new Date(y,mm-1,dd),add=(x,n)=>{m[iso(x)]=n;},
+  move=(mm,dd)=>{const x=dt(mm,dd),w=x.getDay();if(w==2||w==3)x.setDate(x.getDate()-(w-1));else if(w==4||w==5)x.setDate(x.getDate()+(8-w));return x;};
+ add(dt(1,1),'Año Nuevo');if(dt(1,1).getDay()==0)add(dt(1,2),'Feriado');
+ const a=y%19,b=Math.floor(y/100),c=y%100,dd=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-dd-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,mm=Math.floor((a+11*h+22*l)/451),mo=Math.floor((h+l-7*mm+114)/31),da=((h+l-7*mm+114)%31)+1,E=dt(mo,da);
+ const off=n=>{const x=new Date(E);x.setDate(x.getDate()+n);return x;};
+ add(off(-2),'Viernes Santo');add(off(-1),'Sábado Santo');
+ add(dt(5,1),'Día del Trabajo');add(dt(5,21),'Glorias Navales');
+ add(dt(6,({2024:20,2025:20,2028:20,2029:20}[y]||21)),'Pueblos Indígenas');
+ add(move(6,29),'San Pedro y San Pablo');add(dt(7,16),'Virgen del Carmen');add(dt(8,15),'Asunción de la Virgen');
+ if(dt(9,17).getDay()==1)add(dt(9,17),'Feriado Fiestas Patrias');
+ add(dt(9,18),'Fiestas Patrias');add(dt(9,19),'Glorias del Ejército');
+ if(dt(9,20).getDay()==5)add(dt(9,20),'Feriado Fiestas Patrias');
+ add(move(10,12),'Encuentro de Dos Mundos');
+ const o31=dt(10,31),w=o31.getDay();if(w==2)o31.setDate(27);else if(w==3)o31.setMonth(10,2);add(o31,'Iglesias Evangélicas');
+ add(dt(11,1),'Todos los Santos');add(dt(12,8),'Inmaculada Concepción');add(dt(12,25),'Navidad');
+ return FERC[y]=m;
+}
+const feriado=f=>ferYear(+f.slice(0,4))[f]||((DB.feriados||[]).includes(f)?'Feriado':'');
+/* ---------- Sábados por grupos ---------- */
+const GR_N=5,gsN=()=>Array.isArray(DB.gsab)?DB.gsab:[1,3];
+const rkL=x=>{const t=(x.tarea||'').toUpperCase().split('/').map(v=>v.trim());return t.includes('AN')?0:t.includes('SM')?1:2;};
 const dabbr=a=>ORDEN.filter(d=>a.includes(d)).map(d=>DIAS[d].slice(0,2)).join(' ');
 function usage(ex){const c={},h={};for(const[k,v]of Object.entries(hist())){if(k==ex)continue;for(const r of v.rows){if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;}}return[c,h];}
 function counts(){const[c,h]=usage(MES);ROWS.forEach(r=>{if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;});return[c,h];}
@@ -101,18 +131,33 @@ function chg(msg){dirty=true;$('#sv').disabled=false;$('#st').className='save-st
 function clean(msg,cls=''){dirty=false;$('#sv').disabled=true;$('#st').className='save-status '+cls;$('#st').textContent=msg||'';}
 addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});
 
-function gen(keep){
+function gen(keep,only,force){
  document.querySelectorAll('[data-h]').forEach(i=>H[i.dataset.h][0]=i.value);
  document.querySelectorAll('[data-n]').forEach(i=>H[i.dataset.n][1]=+i.value);
  localStorage.setItem('pj_hor',JSON.stringify(H));
  const[y,m]=MES.split('-').map(Number),L=hist()[prevKey(MES)]?.rows||[];
  const lc=new Set(L.map(r=>r.c)),lcd=new Set(L.map(r=>r.c+'|'+P(r.f).getDay())),lhd=new Set(L.map(r=>r.h+'|'+P(r.f).getDay())),lp=new Set(L.map(r=>r.c+'|'+r.h));
  const old=keep?ROWS.slice():[],[uC,uH]=usage(MES),lC={},lH={};ROWS=old.slice();let i=0;
- const tU={},pickT=c=>{const o=(c.cerca?.length?c.cerca:[c.terr]).map(String),t=o.slice().sort((a,b)=>(tU[a]||0)-(tU[b]||0))[0];tU[t]=(tU[t]||0)+1;return t;};
+ const tU={},pickT=(c,ex)=>{const o=(c.cerca?.length?c.cerca:[c.terr]).map(String),fr=o.filter(t=>!ex||!ex.has(t)),t=(fr.length?fr:o).slice().sort((a,b)=>(tU[a]||0)-(tU[b]||0))[0];tU[t]=(tU[t]||0)+1;ex?.add(t);return t;};
  old.forEach(r=>{if(r.c)uC[r.c]=(uC[r.c]||0)+1;if(r.h)uH[r.h]=(uH[r.h]||0)+1;if(r.terr)tU[r.terr]=(tU[r.terr]||0)+1;});
  for(let d=new Date(y,m-1,1);d.getMonth()==m-1;d.setDate(d.getDate()+1),i++){
+  if(only&&iso(d)!=only)continue;
   const dow=d.getDay(),[hs,n]=H[dow],od=old.filter(r=>r.f==iso(d)),hUsed=new Set(od.map(r=>r.h)),cUsed=new Set(od.map(r=>r.c));
-  for(const hora of hs.split(',').map(s=>s.trim()).filter(Boolean)){
+  const horas=hs.split(',').map(s=>s.trim()).filter(Boolean);
+  const gsDay=dow==6&&(only&&force?force=='g':od.some(r=>r.gs)?true:od.some(r=>r.hora<'14:00')?false:gsN().includes(Math.ceil(d.getDate()/7)));
+  if(gsDay){
+   const hm=horas.find(x=>x<'14:00')||'10:30',tx=new Set(od.filter(r=>r.gs).map(r=>r.terr));
+   for(let g=1;g<=GR_N;g++){
+    if(od.some(r=>r.gs&&+r.g==g))continue;
+    const c=best(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,'M')&&!cUsed.has(x.id)),x=>(uC[x.id]||0)*4+(x.gr==g?-10:x.gr?3:0)+(lcd.has(x.id+'|'+dow)?6:lc.has(x.id)?2:0),lC);
+    const h=best(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.gr==g&&x.dias.includes(dow)&&turnoOk(x.turno,'M')&&!hUsed.has(x.id)),x=>(uH[x.id]||0)*3+rkL(x)*2+(lhd.has(x.id+'|'+dow)?6:0),lH);
+    if(c){cUsed.add(c.id);uC[c.id]=(uC[c.id]||0)+1;lC[c.id]=i;}
+    if(h){hUsed.add(h.id);uH[h.id]=(uH[h.id]||0)+1;lH[h.id]=i;}
+    ROWS.push({id:uid(),f:iso(d),hora:hm,g,gs:1,c:c?.id||'',h:h?.id||'',terr:c?pickT(c,tx):''});
+   }
+  }
+  for(const hora of horas){
+   if(gsDay&&hora<'14:00')continue;
    const t=hora<'14:00'?'M':'T';
    for(let g=1;g<=n;g++){
     if(od.some(r=>r.hora==hora&&(+r.g||0)==(n>1?g:0)))continue;
@@ -128,7 +173,7 @@ function gen(keep){
  if(!keep||nn)chg(keep?nn+' salida(s) agregada(s); lo demás quedó igual. Sin guardar.':'Programa regenerado desde cero, sin guardar. Revísalo y edita lo que haga falta.');
  else $('#st').textContent='No falta ninguna salida según los horarios.';
 }
-function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();clean('Mes guardado en el historial.');}
+function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,h:r.h,terr:r.terr}));cur=0;render();clean('Mes guardado en el historial.');}
 function emptyMonth(){ROWS=[];cur=0;render();clean('');}
 
 const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),e=k==3?new Date(y,m,0).getDate():k*7+7;return (k*7+1)+' al '+e+(s?'':' de '+new Date(y,m-1,1).toLocaleDateString('es-CL',{month:'long'}));};
@@ -143,13 +188,15 @@ function weekHtml(k,i,uC,uH){
  const rows=wrows(k),hasPm=new Set(rows.filter(x=>x.hora>='14:00').map(x=>x.f)),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
  const body=rows.map((r,ix)=>{
   const d=P(r.f),dow=d.getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
-  const first=r.f!=pd;pd=r.f;const nx=rows[ix+1]?.f==r.f;
-  const day=`<span class=dl><span class=dn>${String(d.getDate()).padStart(2,'0')}</span><span class=dw>${d.toLocaleDateString('es-CL',{weekday:'long'})}</span></span>`;
+  const first=r.f!=pd;pd=r.f;const nx=rows[ix+1]?.f==r.f,fer=feriado(r.f);
+  const day=`<span class=dl><span class=dn>${String(d.getDate()).padStart(2,'0')}</span><span class=dw>${d.toLocaleDateString('es-CL',{weekday:'long'})}</span>${fer?`<span class=fer title="${esc(fer)}">(festivo)</span>`:''}</span>`;
+  const gsTag=first&&r.gs?'<span class="tag am gsb">Por grupos</span>':'';
   const addPm=EM&&first&&!hasPm.has(r.f)?`<br><button class="mini noprint" data-pm="${r.f}" title="Añadir salida en la tarde">+ Tarde</button>`:'';
+  const gsBtn=EM&&first&&dow==6?`<br><button class="mini noprint" data-tg="${r.f}" data-gm="${r.gs?'n':'g'}" title="${r.gs?'Cambiar este sábado a una sola salida':'Cambiar este sábado a salida por grupos'}">${r.gs?'Salida normal':'Por grupos'}</button>`:'';
   let hc='',cc='',tc='',ac='';
   hc=`<span class=tx><b class=hv>${esc(r.hora)}</b></span>${EM?`<input class="ed hora" data-r=${r.id} data-f=hora value="${esc(r.hora)}">`:''}${r.g?`<span class=cap>Grupo ${r.g}</span>`:''}`;
   if(EM){
-   const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
+   const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH0=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=r.gs&&okH0.some(x=>x.gr==r.g)?okH0.filter(x=>x.gr==r.g):okH0;
    ac=`<span class=tx>${h?`<b>${esc(h.nombre)}</b>`:'<span class=mut>Sin encargado</span>'}</span>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class="cap ed">${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span>`;
    cc=`<span class=tx>${c?`<b>${esc(c.nombre)}</b><span class=cap>${esc(c.dir)}</span>`:'<span class=mut>Sin casa</span>'}</span>${sel('c',r,DB.casas.filter(x=>x.activa!==false||x.id==r.c),okC,uC,lastC,r.c)}<span class="cap ed">${c?(c.activa===false?'⚠ Casa en pausa · ':'')+esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span>`;
    tc=`<span class=tx>${r.terr?`<span class="tag active">${esc(r.terr)}</span>`:'<span class=mut>—</span>'}</span><input class="ed terr" data-r=${r.id} data-f=terr value="${esc(r.terr)}">`;
@@ -158,7 +205,7 @@ function weekHtml(k,i,uC,uH){
    cc=`<span class=tx>${c?`<b>${esc(c.nombre)}</b><span class=cap>${esc(c.dir)}</span>`:'<span class=mut>Sin casa</span>'}</span>`;
    tc=`<span class=tx>${r.terr?`<span class="tag active">${esc(r.terr)}</span>`:'<span class=mut>—</span>'}</span>`;
   }
-  return `<tr class="${t=='M'?'am':'pm'}${first?' first':''}${first?'':' cont'}${nx?' more':''}"><td class="day${first?'':' rep'}" data-label="Fecha">${day}${addPm}</td>
+  return `<tr class="${t=='M'?'am':'pm'}${first?' first':''}${first?'':' cont'}${nx?' more':''}"><td class="day${first?'':' rep'}" data-label="Fecha">${day}${gsTag}${addPm}${gsBtn}</td>
   <td class=hr data-label="Hora">${hc}</td><td data-label="Encargado">${ac}</td><td data-label="Lugar">${cc}</td><td data-label="Territorio">${tc}</td>${EM?`<td class=noprint data-label=""><button class="small danger" data-del=${r.id} title="Quitar fila">✕</button></td>`:''}</tr>`;}).join('');
  return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación · ${mname(MES)}</div>
  <div class=wh><div><span class=eyebrow>Semana ${i+1}</span><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2></div><span class=noprint>${EM?`<button data-add=${i}>+ Fila</button> `:''}<button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
@@ -173,6 +220,16 @@ function render(){
  const ks=Object.keys(hist()).sort().reverse();
  $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow style="margin:0">${k.slice(0,4)}</span><b style="text-transform:capitalize;font-family:var(--serif);font-size:18px">${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button>${EM?`<button data-hd=${k} class=danger title="Eliminar del archivo">✕</button>`:''}</div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
 }
+function toggleGS(f,mode){
+ ROWS=mode=='n'?ROWS.filter(r=>!(r.f==f&&r.gs)):ROWS.filter(r=>!(r.f==f&&r.hora<'14:00'));
+ gen(true,f,mode);
+}
+function cfgUi(){
+ $('#gsc').innerHTML=[1,2,3,4,5].map(n=>`<label class=chk><input type=checkbox data-gsn=${n} ${gsN().includes(n)?'checked':''}>${n}.º sábado</label>`).join('');
+ $('#fx').value=(DB.feriados||[]).join(', ');
+}
+$('#gsc').onchange=e=>{const n=+e.target.dataset.gsn;if(!n)return;const st=new Set(gsN());e.target.checked?st.add(n):st.delete(n);DB.gsab=[...st].sort();chg('Cambiaste los sábados por grupos. Usa «Regenerar todo el mes» para aplicarlo. Sin guardar.');};
+$('#fx').onchange=e=>{DB.feriados=e.target.value.match(/\d{4}-\d{2}-\d{2}/g)||[];cfgUi();render();chg();};
 function addPm(f){
  const dow=P(f).getDay(),[uC,uH]=counts(),used=ROWS.filter(r=>r.f==f&&r.hora=='18:00'),uc=new Set(used.map(r=>r.c)),uh=new Set(used.map(r=>r.h));
  const c=best(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,'T')&&!uc.has(x.id)),x=>uC[x.id]||0,{});
@@ -182,12 +239,13 @@ function addPm(f){
  ROWS.push({id:uid(),f,hora:'18:00',g:0,c:c?.id||'',h:h?.id||'',terr});
 }
 const txt=i=>`Programa de predicación — Congregación Curauma\nSemana del ${lab(WK[i])}\n`+wrows(WK[i]).map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
- return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
+ return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})}${feriado(r.f)?' (festivo)':''} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
 $('#weeks').onchange=e=>{if(!EM)return;const t=e.target,r=ROWS.find(x=>x.id==t.dataset.r),f=t.dataset.f;if(!r)return;r[f]=t.value;
  if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.cerca?.[0]||DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h'||f=='hora')render();chg();};
 document.addEventListener('click',async e=>{const d=e.target.dataset||{};
  if(d.w!==undefined){cur=+d.w;render();}
  if(d.pm&&EM){addPm(d.pm);render();chg();}
+ if(d.tg&&EM){toggleGS(d.tg,d.gm);}
  if(d.del&&EM){ROWS=ROWS.filter(r=>r.id!=d.del);render();chg();}
  if(d.add!==undefined&&EM){const f=prompt('Fecha de la nueva fila (AAAA-MM-DD)',wrows(WK[d.add])[0]?.f||'');if(f){ROWS.push({id:uid(),f,hora:'10:00',g:0,c:'',h:'',terr:''});render();chg();}}
  if(d.pdf!==undefined){document.body.classList.add('one');document.querySelectorAll('.wk').forEach((w,j)=>w.classList.toggle('pr',j==+d.pdf));print();}
@@ -198,7 +256,7 @@ document.addEventListener('click',async e=>{const d=e.target.dataset||{};
 addEventListener('afterprint',()=>document.body.classList.remove('one'));
 $('#pm').onclick=()=>print();
 $('#sv').onclick=async()=>{if(!AUTH)return;if(!ROWS.length)return toast('Genera un mes primero');
- hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{f:r.f,hora:r.hora,g:r.g,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr};})};
+ hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr};})};
  localStorage.setItem('pj_hist',JSON.stringify(hist()));
  $('#sv').disabled=true;$('#st').className='save-status';$('#st').textContent='Guardando…';
  try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub) ✓','ok');clean('Guardado ✓','ok');}
@@ -224,7 +282,7 @@ load().then(async()=>{
  const n=new Date();n.setMonth(n.getMonth()+1,1);MES=iso(n).slice(0,7);
  const ks=Object.keys(hist()).sort();
  if(!hist()[MES]&&!AUTH&&ks.length)MES=ks[ks.length-1];
- $('#mes').value=MES;
+ $('#mes').value=MES;cfgUi();
  hist()[MES]?openMonth(MES):emptyMonth();
 });
 </script></body></html>
