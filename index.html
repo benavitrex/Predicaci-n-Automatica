@@ -7,6 +7,15 @@ dialog.wide{width:min(560px,calc(100% - 32px));max-height:90vh;overflow:auto}
 .err{color:var(--bad);font-size:12.5px;font-weight:600;margin:10px 0 0}
 .panel-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
 .panel-head .sub{margin:0;flex:1 1 260px}
+.cc .wkd{margin-top:2px}
+.cc .alt{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.cc .alt .lb{margin:0 4px 0 0}
+.pgbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding-top:12px;border-top:1px dashed var(--line)}
+.pgbar .pg-size{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--soft)}
+.pgbar select{padding:5px 9px}
+.pgbar .pg-mid{display:flex;align-items:center;gap:10px;margin-left:auto}
+.pgbar .pg-info{font-size:12.5px;color:var(--soft)}
+.pgbar .arr{padding:5px 12px;font-size:16px;line-height:1}
 </style></head><body>
 <iframe class="map" title="Mapa de territorios" loading="lazy" allowfullscreen
  src="https://www.google.com/maps/d/embed?mid=1H8j2hSNLHMMxyiIiBI___XOZpPDxobc&ll=-33.1185198147293%2C-71.5801330577226&z=16"></iframe>
@@ -70,6 +79,29 @@ shell('i');
 let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
 const ES={hermanos:{q:'',f:'si',size:10,page:1},casas:{q:'',f:'',size:10,page:1}};
 const ORD={AN:0,SM:1,PRE:2,PUB:3};
+/* Paginación de las listas públicas (casas / varones) */
+const PS={casas:{size:9,page:1,sig:''},varones:{size:9,page:1,sig:''}};
+const SIZES=[[9,'9'],[18,'18'],[27,'27'],[9999,'Todos']];
+function paginate(k,L,sig){
+ const S=PS[k];if(S.sig!==sig){S.sig=sig;S.page=1;}
+ const pages=Math.max(1,Math.ceil(L.length/S.size));S.page=Math.min(Math.max(1,S.page),pages);
+ const st=(S.page-1)*S.size,pg=L.slice(st,st+S.size);
+ const bar=L.length<=SIZES[0][0]?'':`<div class=pgbar>
+  <label class=pg-size>Mostrar <select data-ps="${k}" aria-label="Cuántos ver a la vez">${SIZES.map(([v,l])=>`<option value="${v}" ${S.size==v?'selected':''}>${l}</option>`).join('')}</select></label>
+  <span class=pg-mid><span class=pg-info>${st+1}–${st+pg.length} de ${L.length}</span>
+  <button class="ghost arr" type="button" data-pn="${k}:-1" aria-label="Anterior" ${S.page<=1?'disabled':''}>‹</button>
+  <button class="ghost arr" type="button" data-pn="${k}:1" aria-label="Siguiente" ${S.page>=pages?'disabled':''}>›</button></span></div>`;
+ return{pg,bar};
+}
+const weekStrip=(days,sel)=>ORDEN.map(d=>{const on=days.includes(d);return `<span class="dd ${on?'on':''} ${d==sel?'sel':''}" title="${DIAS[d]}: ${on?'disponible':'no disponible'}">${DIAS[d].slice(0,2)}</span>`;}).join('');
+function ccard(x){
+ const otros=[...new Set((x.cerca||[]).map(String))].filter(t=>t!==String(x.terr));
+ return `<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span>
+  <span class="tag acc">Territorio ${esc(x.terr||'—')}</span>
+  ${otros.length?`<div class=alt><span class=lb>También con</span>${otros.map(t=>`<span class=tag>Terr. ${esc(t)}</span>`).join('')}</div>`:''}
+  <div><span class=lb>Semana · días disponibles</span><div class=wkd role=group aria-label="Días disponibles de ${esc(x.nombre)}">${weekStrip(x.dias||[],fd)}</div></div>
+  ${turnoBadges(x.turno)}${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`;
+}
 const uid=()=>Math.random().toString(36).slice(2,9);
 
 const RG={AN:'Anciano',SM:'Siervo ministerial',PR:'Precursor regular',PE:'Precursor especial',PA:'Precursor auxiliar',PTJ:'Publicador',SC:'Superintendente de circuito'};
@@ -99,8 +131,9 @@ function cards(){
  const C=DB.casas.filter(x=>(EM||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
  const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ORD[rk(a).main]-ORD[rk(b).main]||a.nombre.localeCompare(b.nombre));
  $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
- $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${turnoBadges(x.turno)}${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
- $('#lv0').innerHTML=V.length?`<div class=vgrid>${V.map(vcard).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
+ const PC=paginate('casas',C,[fd,ft,n1,EM].join('|')),PV=paginate('varones',V,[fv,fvt,fr,fgp,n2].join('|'));
+ $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${PC.pg.map(ccard).join('')}</div>${PC.bar}`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
+ $('#lv0').innerHTML=V.length?`<div class=vgrid>${PV.pg.map(vcard).join('')}</div>${PV.bar}`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
 
 /* ---------- Lista de edición (ordenada y paginada) ---------- */
@@ -142,6 +175,7 @@ const find=el=>{const it=el.closest?.('.erow');return it&&[DB[it.dataset.k],DB[i
 document.addEventListener('click',e=>{
  const ds=e.target.dataset||{};
  if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}
+ if('pn' in ds){const[k,d]=ds.pn.split(':');PS[k].page+=+d;return cards();}
  if('pp' in ds){const[k,d]=ds.pp.split(':');ES[k].page+=+d;return elist(k);}
  const r=find(e.target);if(!r||!AUTH)return;const [arr,x]=r;
  if(ds.edit!==undefined){openM(e.target.closest('.erow').dataset.k,x);return;}
@@ -153,6 +187,7 @@ document.addEventListener('click',e=>{
  }
  if(ds.del!==undefined&&confirm('¿Eliminar '+x.nombre+'?')){arr.splice(arr.indexOf(x),1);render();dirty();}
 });
+document.addEventListener('change',e=>{const k=e.target.dataset?.ps;if(!k)return;PS[k].size=+e.target.value;PS[k].page=1;cards();});
 document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList?.contains('chip')){e.preventDefault();e.target.click();}});
 document.addEventListener('change',e=>{const id=e.target.dataset?.ca;if(id===undefined||!AUTH)return;const x=DB.casas.find(c=>c.id==id);if(x){x.activa=e.target.checked;render();dirty();}});
 document.addEventListener('change',e=>{
