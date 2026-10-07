@@ -11,8 +11,9 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 <section class="card noprint"><h2>1 · Elegir el mes</h2>
  <form id="f" style="padding:0">
   <label class="chk">Mes <input type="month" id="mes" required></label>
-  <button class="pri">Generar / regenerar</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
+  <button class="pri" title="Agrega las salidas que falten sin tocar lo que ya editaste">Generar</button><button type="button" id="rg" title="Rehace todo el mes desde cero">Regenerar todo el mes</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
  </form><small id="st"></small>
+ <small class=hint style="margin-top:6px"><b>Generar</b>: agrega las salidas que falten (por ejemplo, tras marcar la tarde en otro día) sin tocar lo que ya editaste. <b>Regenerar todo el mes</b>: borra el programa en pantalla y lo arma de nuevo desde cero.</small>
  <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><small class=hint style="margin-top:6px">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</small><div id="hor" class="hg"></div></details>
 </section>
 <div id="mh" class="mh noprint"></div>
@@ -26,6 +27,7 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 shell('p');document.body.classList.add('pg');
 const uid=()=>Math.random().toString(36).slice(2,9);
 const H=JSON.parse(localStorage.getItem('pj_hor')||'null')||{0:['10:30',1],1:['10:00',1],2:['10:00',1],3:['10:00, 18:00',1],4:['10:00',1],5:['10:00, 18:00',1],6:['10:30',1]};
+if(!localStorage.getItem('pj_hor_m')){[3,5].forEach(d=>{if(!/\b(1[4-9]|2\d):/.test(H[d][0]))H[d][0]=[H[d][0].trim(),'18:00'].filter(Boolean).join(', ');});localStorage.setItem('pj_hor_m','1');localStorage.setItem('pj_hor',JSON.stringify(H));}
 $('#hor').innerHTML=ORDEN.map(d=>`<div><b>${DIAS[d]}</b><br><input data-h=${d} value="${H[d][0]}" size=11 placeholder="10:00, 18:00"> <input data-n=${d} type=number min=0 max=6 value=${H[d][1]} style="width:52px" title="Salidas por horario"><br><label class=chk><input type=checkbox data-tt=${d} ${/\b(1[4-9]|2\d):/.test(H[d][0])?'checked':''}>Salida en la tarde (18:00)</label></div>`).join('');
 $('#hor').onchange=e=>{const d=e.target.dataset.tt;if(d===undefined)return;const i=$(`[data-h="${d}"]`),h=i.value.split(',').map(s=>s.trim()).filter(s=>s&&s<'14:00');if(e.target.checked)h.push('18:00');i.value=h.join(', ');};
 let ROWS=[],MES='',WK=[],cur=0;
@@ -39,19 +41,21 @@ function usage(ex){const c={},h={};for(const[k,v]of Object.entries(hist())){if(k
 function counts(){const[c,h]=usage(MES);ROWS.forEach(r=>{if(r.c)c[r.c]=(c[r.c]||0)+1;if(r.h)h[r.h]=(h[r.h]||0)+1;});return[c,h];}
 const best=(a,sc,l)=>a.map(x=>[x,sc(x)]).sort((p,q)=>p[1]-q[1]||(l[p[0].id]??-1)-(l[q[0].id]??-1))[0]?.[0];
 
-function gen(){
+function gen(keep){
  document.querySelectorAll('[data-h]').forEach(i=>H[i.dataset.h][0]=i.value);
  document.querySelectorAll('[data-n]').forEach(i=>H[i.dataset.n][1]=+i.value);
  localStorage.setItem('pj_hor',JSON.stringify(H));
  const[y,m]=MES.split('-').map(Number),L=hist()[prevKey(MES)]?.rows||[];
  const lc=new Set(L.map(r=>r.c)),lcd=new Set(L.map(r=>r.c+'|'+P(r.f).getDay())),lhd=new Set(L.map(r=>r.h+'|'+P(r.f).getDay())),lp=new Set(L.map(r=>r.c+'|'+r.h));
- const[uC,uH]=usage(MES),lC={},lH={};ROWS=[];let i=0;
+ const old=keep?ROWS.slice():[],[uC,uH]=usage(MES),lC={},lH={};ROWS=old.slice();let i=0;
  const tU={},pickT=c=>{const o=(c.cerca?.length?c.cerca:[c.terr]).map(String),t=o.slice().sort((a,b)=>(tU[a]||0)-(tU[b]||0))[0];tU[t]=(tU[t]||0)+1;return t;};
+ old.forEach(r=>{if(r.c)uC[r.c]=(uC[r.c]||0)+1;if(r.h)uH[r.h]=(uH[r.h]||0)+1;if(r.terr)tU[r.terr]=(tU[r.terr]||0)+1;});
  for(let d=new Date(y,m-1,1);d.getMonth()==m-1;d.setDate(d.getDate()+1),i++){
-  const dow=d.getDay(),[hs,n]=H[dow],hUsed=new Set();
+  const dow=d.getDay(),[hs,n]=H[dow],od=old.filter(r=>r.f==iso(d)),hUsed=new Set(od.map(r=>r.h)),cUsed=new Set(od.map(r=>r.c));
   for(const hora of hs.split(',').map(s=>s.trim()).filter(Boolean)){
-   const t=hora<'14:00'?'M':'T',cUsed=new Set();
+   const t=hora<'14:00'?'M':'T';
    for(let g=1;g<=n;g++){
+    if(od.some(r=>r.hora==hora&&(+r.g||0)==(n>1?g:0)))continue;
     const c=best(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!cUsed.has(x.id)),x=>(uC[x.id]||0)*4+(lcd.has(x.id+'|'+dow)?6:lc.has(x.id)?2:0),lC);
     const h=best(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)&&!hUsed.has(x.id)),x=>(uH[x.id]||0)*4+(lhd.has(x.id+'|'+dow)?6:0)+(c&&lp.has(c.id+'|'+x.id)?8:0),lH);
     if(c){cUsed.add(c.id);uC[c.id]=(uC[c.id]||0)+1;lC[c.id]=i;}
@@ -60,7 +64,7 @@ function gen(){
    }
   }
  }
- cur=0;render();$('#st').textContent='Programa generado, sin guardar. Revísalo y edita lo que haga falta.';
+ const nn=ROWS.length-old.length;if(!keep)cur=0;render();$('#st').textContent=keep?(nn?nn+' salida(s) agregada(s); lo demás quedó igual. Sin guardar.':'No falta ninguna salida según los horarios.'):'Programa regenerado desde cero, sin guardar. Revísalo y edita lo que haga falta.';
 }
 function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,c:r.c,h:r.h,terr:r.terr}));cur=0;render();$('#st').textContent='Mes guardado en el historial.';}
 
@@ -124,7 +128,8 @@ $('#sv').onclick=async()=>{if(!ROWS.length)return toast('Genera un mes primero')
  localStorage.setItem('pj_hist',JSON.stringify(hist()));
  try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub)');}catch(e){toast('Guardado solo en este navegador: '+e.message);}
  $('#st').textContent='Mes guardado en el historial.';render();};
-$('#f').onsubmit=e=>{e.preventDefault();MES=$('#mes').value;if(!MES)return;if(hist()[MES]&&!confirm('Este mes ya está guardado. ¿Regenerarlo desde cero?'))return openMonth(MES);gen();};
+$('#f').onsubmit=e=>{e.preventDefault();MES=$('#mes').value;if(!MES)return;if(!ROWS.length||ROWS[0].f.slice(0,7)!=MES)return hist()[MES]?openMonth(MES):gen();gen(true);};
+$('#rg').onclick=()=>{MES=$('#mes').value;if(!MES)return;if(!confirm('Se rehará todo el programa de '+mname(MES)+' desde cero y se perderán los cambios manuales de la pantalla. ¿Continuar?'))return;gen();};
 $('#mes').onchange=()=>{MES=$('#mes').value;if(!MES)return;hist()[MES]?openMonth(MES):gen();};
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip'))e.target.click();});
 load().then(()=>{
