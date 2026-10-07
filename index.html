@@ -12,7 +12,7 @@
   <div class="frow"><span class="fl-l">Turno</span><div class="fl" id="fct"></div></div>
   <div id="lc0"></div></section>
  <section class="card"><span class="eyebrow">Grupos</span><h2>Varones disponibles <span class="badge" id="nv"></span></h2>
-  <p class="sub">Quién puede sacar grupo, según rango, día y turno. Cada tarjeta muestra la semana completa.</p>
+  <p class="sub">Quién puede sacar grupo, según rango, día y turno. En verde, los días en que puede salir.</p>
   <input id="q2" type="search" placeholder="Buscar hermano…" aria-label="Buscar hermano">
   <div class="vbar">
   <div class="frow"><span class="fl-l">Grupo</span><div class="fl" id="fvg"></div></div>
@@ -24,24 +24,42 @@
 </div>
 
 <section class="card noprint" id="ph" hidden><span class="eyebrow">Edición</span><h2>Hermanos</h2>
- <p class="sub">Añade hermanos y marca los días en que sacan grupo.</p>
+ <p class="sub">Añade hermanos y elige los días y el turno (mañana, tarde o ambos) en que sacan grupo.</p>
  <form id="fh">
   <input name="nombre" placeholder="Nombre" required>
   <input name="tarea" placeholder="Tarea (AN, SM, PTJ…)" size="14">
   <label class="chk"><input type="checkbox" name="grupo" checked>Puede sacar grupo</label>
-  <select name="turno"><option value="MT">Mañana y tarde</option><option value="M">Mañana</option><option value="T">Tarde</option></select>
+  <select name="turno" aria-label="Turno"><option value="MT">Mañana y tarde</option><option value="M">Solo mañana</option><option value="T">Solo tarde</option></select>
   <span id="fhd"></span><button class="pri">Añadir</button>
- </form><div id="lh"></div></section>
+ </form>
+ <div class="controls">
+  <input type="search" id="eq_hermanos" placeholder="Buscar hermano en la lista…" aria-label="Buscar hermano en la lista">
+  <select id="ef_hermanos" aria-label="Filtrar lista"><option value="">Todos</option><option value="si">Sacan grupo</option><option value="no">No sacan grupo</option></select>
+  <select id="es_hermanos" aria-label="Cuántos ver a la vez"><option value="10">Ver 10</option><option value="15">Ver 15</option><option value="25">Ver 25</option><option value="9999">Ver todos</option></select>
+ </div>
+ <div class="count-note" id="ec_hermanos" role="status"></div>
+ <div id="lh"></div>
+ <div class="pagination" id="pg_hermanos"><span class="pg-info" id="pi_hermanos"></span><span class="pg-btns"><button class="ghost small" type="button" data-pp="hermanos:-1" id="pp_hermanos">‹ Anterior</button><button class="ghost small" type="button" data-pp="hermanos:1" id="pn_hermanos">Siguiente ›</button></span></div>
+</section>
 
 <section class="card noprint" id="pc" hidden><span class="eyebrow">Edición</span><h2>Casas</h2>
- <p class="sub">Añade casas y marca los días en que pueden recibir el grupo.</p>
+ <p class="sub">Añade casas y elige los días y el turno (mañana, tarde o ambos) en que pueden recibir el grupo. El generador respeta estas opciones.</p>
  <form id="fc">
   <input name="nombre" placeholder="Familia (ej. Fam. Cabezas)" required>
   <input name="dir" placeholder="Dirección" required>
   <input name="terr" placeholder="Territorio" size="8">
-  <select name="turno"><option value="MT">Mañana y tarde</option><option value="M">Mañana</option><option value="T">Tarde</option></select>
+  <select name="turno" aria-label="Turno"><option value="MT">Mañana y tarde</option><option value="M">Solo mañana</option><option value="T">Solo tarde</option></select>
   <span id="fcdd"></span><button class="pri">Añadir</button>
- </form><div id="lc"></div></section>
+ </form>
+ <div class="controls">
+  <input type="search" id="eq_casas" placeholder="Buscar casa en la lista…" aria-label="Buscar casa en la lista">
+  <select id="ef_casas" aria-label="Filtrar lista"><option value="">Todas</option><option value="si">Activas</option><option value="no">En pausa</option></select>
+  <select id="es_casas" aria-label="Cuántas ver a la vez"><option value="10">Ver 10</option><option value="15">Ver 15</option><option value="25">Ver 25</option><option value="9999">Ver todas</option></select>
+ </div>
+ <div class="count-note" id="ec_casas" role="status"></div>
+ <div id="lc"></div>
+ <div class="pagination" id="pg_casas"><span class="pg-info" id="pi_casas"></span><span class="pg-btns"><button class="ghost small" type="button" data-pp="casas:-1" id="pp_casas">‹ Anterior</button><button class="ghost small" type="button" data-pp="casas:1" id="pn_casas">Siguiente ›</button></span></div>
+</section>
 </main>
 
 <div class="edit-bar noprint" id="editBar" hidden role="toolbar" aria-label="Edición">
@@ -54,7 +72,8 @@
 <script>
 shell('i');
 let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si',q1='',q2='';
-const TN={MT:'Mañana y tarde',M:'Mañana',T:'Tarde'};
+const ES={hermanos:{q:'',f:'si',size:10,page:1},casas:{q:'',f:'',size:10,page:1}};
+const ORD={AN:0,SM:1,PRE:2,PUB:3};
 const uid=()=>Math.random().toString(36).slice(2,9);
 const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=d value=${d} ${d>0?'checked':''}>${DIAS[d].slice(0,3)}</label>`).join('');
 $('#fhd').innerHTML=boxes();$('#fcdd').innerHTML=boxes();
@@ -65,13 +84,15 @@ const isPre=s=>s.startsWith('PR')||s=='PE'||s=='PA';
 const rk=x=>{const t=(x.tarea||'').split('/').map(s=>s.trim().toUpperCase()),an=t.includes('AN'),sm=t.includes('SM'),pre=t.some(isPre);return{AN:an,SM:sm,PRE:pre,PUB:!an&&!sm&&!pre,main:an?'AN':sm?'SM':pre?'PRE':'PUB'};};
 const chips=(arr,cur,a)=>arr.map(([v,l])=>`<span class="chip ${cur==v?'on':''}" data-${a}="${v}" tabindex=0>${l}</span>`).join('');
 const TURNOS=[['','Todos'],['M','☀ Mañana'],['T','🌙 Tarde']];
+const turnoBadges=t=>`<span class=tj>${turnoOk(t,'M')?'<span class=bd>☀ Mañana</span>':''}${turnoOk(t,'T')?'<span class=bd>🌙 Tarde</span>':''}</span>`;
+
 function vcard(x){
  const r=rk(x).main,days=ORDEN.filter(d=>x.dias.includes(d));
  const strip=ORDEN.map(d=>{const on=x.dias.includes(d);return `<span class="dd ${on?'on':''} ${d==fv?'sel':''}" title="${DIAS[d]}: ${on?'disponible':'no disponible'}">${DIAS[d].slice(0,2)}</span>`;}).join('');
  const sum=!x.grupo?'No saca grupo':!days.length?'Sin día asignado':days.length==7?'Disponible todos los días':days.length+(days.length==1?' día':' días')+' a la semana · '+days.map(d=>DIAS[d].slice(0,3)).join(', ');
  return `<article class=vm><div class=vt><b class=vn>${esc(x.nombre)}</b><span class="bd rk-${r}">${rango(x.tarea)}</span></div>
   <div><span class=lb>Semana · días disponibles</span><div class=wkd role=group aria-label="Días disponibles de ${esc(x.nombre)}">${strip}</div><div class=wsum>${sum}</div></div>
-  <div class=vf><div class=vj>${turnoOk(x.turno,'M')?'<span class=bd>☀️ Mañana</span>':''}${turnoOk(x.turno,'T')?'<span class=bd>🌙 Tarde</span>':''}</div>
+  <div class=vf>${turnoBadges(x.turno)}
   <span class="lg ${x.grupo?'si':'no'}">${x.grupo?'✓ Saca grupo: Sí':'✕ Saca grupo: No'}</span></div></article>`;
 }
 function cards(){
@@ -80,29 +101,47 @@ function cards(){
  $('#fct').innerHTML=chips(TURNOS,ft,'ft');$('#fvt').innerHTML=chips(TURNOS,fvt,'fvt');
  $('#fvg').innerHTML=chips([['','Todos'],['si','Saca grupo']],fgp,'fg');
  $('#fvr').innerHTML=chips([['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']],fr,'fr');
- const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase(),ord={AN:0,SM:1,PRE:2,PUB:3};
+ const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase();
  const C=DB.casas.filter(x=>(EM||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
- const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ord[rk(a).main]-ord[rk(b).main]||a.nombre.localeCompare(b.nombre));
+ const V=DB.hermanos.filter(x=>(fgp!='si'||x.grupo)&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ORD[rk(a).main]-ORD[rk(b).main]||a.nombre.localeCompare(b.nombre));
  $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
- $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
+ $('#lc0').innerHTML=(EM?'<p class=hint style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${turnoBadges(x.turno)}${EM?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
  $('#lv0').innerHTML=V.length?`<div class=vgrid>${V.map(vcard).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
-function item(k,x){
- const h=k=='hermanos',g=!h||x.grupo;
- const sub=h?[x.tarea,x.gr?'Gr. '+x.gr:''].filter(Boolean).join(' · '):(x.dir||'')+(x.terr?' · Terr. '+x.terr:'');
- return `<div class=item data-k=${k} data-id=${x.id}><div><b>${esc(x.nombre)}</b> <small>${esc(sub)}</small></div>
- ${h?`<label class=chk><input type=checkbox data-g ${x.grupo?'checked':''}>Puede sacar grupo</label>`:''}
- <div>${g?ORDEN.map(d=>`<span class="chip ${x.dias.includes(d)?'on':''}" data-d=${d} title="${h?'Día en que saca grupo':'Día disponible'}">${DIAS[d].slice(0,2)}</span>`).join(''):''}</div>
- <select data-t>${Object.keys(TN).map(t=>`<option value=${t} ${x.turno==t?'selected':''}>${TN[t]}</option>`).join('')}</select>
- <label class=chk><input type=checkbox data-a ${x.activa!==false?'checked':''}>Disponible</label><button class="danger small" data-del title="Eliminar">✕</button></div>`;
+
+/* ---------- Lista de edición (ordenada y paginada) ---------- */
+const turnoBtns=t=>`<div class=tj>`+[['M','☀ Mañana'],['T','🌙 Tarde']].map(([v,l])=>{const on=turnoOk(t,v);return `<span class="chip ${on?'on':''}" data-tn=${v} role=button tabindex=0 aria-pressed=${on}>${l}</span>`;}).join('')+`</div>`;
+function erow(k,x){
+ const h=k=='hermanos',g=!h||x.grupo,off=x.activa===false;
+ const sub=h?[rango(x.tarea),x.gr?'Gr. '+esc(x.gr):''].filter(Boolean).join(' · '):esc((x.dir||'')+(x.terr?' · Terr. '+x.terr:''));
+ return `<tr class="erow ${off?'off':''}" data-k=${k} data-id=${x.id}>
+ <td class=nm data-label="Nombre"><b>${esc(x.nombre)}</b><small>${sub}</small></td>
+ ${h?`<td data-label="Saca grupo"><label class=sw><input type=checkbox data-g aria-label="Puede sacar grupo" ${x.grupo?'checked':''}><i></i></label></td>`:''}
+ <td class=dy data-label="Días">${g?`<div class=tj>`+ORDEN.map(d=>`<span class="chip ${x.dias.includes(d)?'on':''}" data-d=${d} role=button tabindex=0 title="${DIAS[d]}">${DIAS[d].slice(0,2)}</span>`).join('')+`</div>`:'<span class=mut>No saca grupo</span>'}</td>
+ <td data-label="Turno">${g?turnoBtns(x.turno):'<span class=mut>—</span>'}</td>
+ <td data-label="${h?'Disponible':'Activa'}"><label class=sw><input type=checkbox data-a aria-label="${h?'Disponible':'Activa'}" ${off?'':'checked'}><i></i></label></td>
+ <td data-label=""><button class="danger small" data-del title="Eliminar" aria-label="Eliminar ${esc(x.nombre)}">✕</button></td></tr>`;
 }
+function elist(k){
+ const h=k=='hermanos',S=ES[k],q=S.q.trim().toLowerCase();
+ const L=DB[k].filter(x=>{const on=h?!!x.grupo:x.activa!==false;return(!q||(x.nombre+' '+(x.tarea||'')+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(q))&&(!S.f||(S.f=='si')==on);})
+  .sort(h?(a,b)=>(!!b.grupo-!!a.grupo)||ORD[rk(a).main]-ORD[rk(b).main]||a.nombre.localeCompare(b.nombre):(a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
+ const pages=Math.max(1,Math.ceil(L.length/S.size));S.page=Math.min(Math.max(1,S.page),pages);
+ const st=(S.page-1)*S.size,pg=L.slice(st,st+S.size);
+ $('#ec_'+k).innerHTML=L.length?`Mostrando <b>${st+1}–${st+pg.length}</b> de <b>${L.length}</b> (${DB[k].length} en total)`:`0 de ${DB[k].length}`;
+ $(h?'#lh':'#lc').innerHTML=pg.length?`<div class="table-wrap e"><table class=etable><thead><tr><th>Nombre</th>${h?'<th>Saca grupo</th>':''}<th>Días</th><th>Turno</th><th>${h?'Disponible':'Activa'}</th><th></th></tr></thead><tbody>${pg.map(x=>erow(k,x)).join('')}</tbody></table></div>`:'<p class=sub>Nada coincide con estos filtros.</p>';
+ $('#pg_'+k).hidden=pages<=1;$('#pi_'+k).textContent=`Página ${S.page} de ${pages}`;$('#pp_'+k).disabled=S.page<=1;$('#pn_'+k).disabled=S.page>=pages;
+}
+['hermanos','casas'].forEach(k=>{
+ $('#eq_'+k).oninput=e=>{ES[k].q=e.target.value;ES[k].page=1;elist(k);};
+ $('#ef_'+k).value=ES[k].f;$('#ef_'+k).onchange=e=>{ES[k].f=e.target.value;ES[k].page=1;elist(k);};
+ $('#es_'+k).value=ES[k].size;$('#es_'+k).onchange=e=>{ES[k].size=+e.target.value;ES[k].page=1;elist(k);};
+});
 function render(){
  cards();
  $('#ph').hidden=$('#pc').hidden=!EM;
  if(!EM)return;
- $('#lc').innerHTML=DB.casas.map(x=>item('casas',x)).join('')||'<small>Aún no hay casas.</small>';
- const G=DB.hermanos.filter(x=>x.grupo),O=DB.hermanos.filter(x=>!x.grupo);
- $('#lh').innerHTML=(G.length?`<h3>Pueden sacar grupo (${G.length})</h3>`+G.map(x=>item('hermanos',x)).join(''):'<small>Nadie marcado para sacar grupo.</small>')+(O.length?`<h3>Otros hermanos (${O.length})</h3>`+O.map(x=>item('hermanos',x)).join(''):'');
+ elist('hermanos');elist('casas');
 }
 function dirty(){$('#saveBtn').disabled=false;$('#st').className='save-status';$('#st').textContent='Cambios sin guardar';}
 function add(e,k){
@@ -111,20 +150,27 @@ function add(e,k){
  e.target.reset();render();dirty();toast((f.get('nombre')||'Registro')+' añadido ✓','ok');
 }
 $('#fc').onsubmit=e=>add(e,'casas');$('#fh').onsubmit=e=>add(e,'hermanos');
-const find=el=>{const it=el.closest('.item');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
+const find=el=>{const it=el.closest?.('.erow');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
 document.addEventListener('click',e=>{
  const ds=e.target.dataset||{};
  if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}
+ if('pp' in ds){const[k,d]=ds.pp.split(':');ES[k].page+=+d;return elist(k);}
  const r=find(e.target);if(!r||!AUTH)return;const [arr,x]=r;
  if(ds.d!==undefined){const d=+ds.d;x.dias=x.dias.includes(d)?x.dias.filter(v=>v!=d):[...x.dias,d];render();dirty();}
+ if(ds.tn!==undefined){
+  const cur=x.turno||'MT',has={M:turnoOk(cur,'M'),T:turnoOk(cur,'T')};has[ds.tn]=!has[ds.tn];
+  if(!has.M&&!has.T){toast('Debe quedar al menos un turno','err');return;}
+  x.turno=has.M&&has.T?'MT':has.M?'M':'T';render();dirty();
+ }
  if(ds.del!==undefined&&confirm('¿Eliminar '+x.nombre+'?')){arr.splice(arr.indexOf(x),1);render();dirty();}
 });
-document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip')&&!e.target.closest('.item'))e.target.click();});
+document.addEventListener('keydown',e=>{if((e.key=='Enter'||e.key==' ')&&e.target.classList?.contains('chip')){e.preventDefault();e.target.click();}});
 document.addEventListener('change',e=>{const id=e.target.dataset?.ca;if(id===undefined||!AUTH)return;const x=DB.casas.find(c=>c.id==id);if(x){x.activa=e.target.checked;render();dirty();}});
 document.addEventListener('change',e=>{
  const r=find(e.target);if(!r||!AUTH)return;const x=r[1],ds=e.target.dataset;
- if('g' in ds){x.grupo=e.target.checked;if(x.grupo&&!x.dias.length)x.dias=[...ORDEN];render();}
- if('t' in ds)x.turno=e.target.value;if('a' in ds)x.activa=e.target.checked;dirty();cards();
+ if('g' in ds){x.grupo=e.target.checked;if(x.grupo&&!x.dias.length)x.dias=[...ORDEN];}
+ if('a' in ds)x.activa=e.target.checked;
+ render();dirty();
 });
 $('#q1').oninput=e=>{q1=e.target.value;cards();};$('#q2').oninput=e=>{q2=e.target.value;cards();};
 $('#editModeBtn').onclick=()=>{

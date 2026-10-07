@@ -157,8 +157,8 @@ button:focus-visible,.icon-btn:focus-visible,nav a:focus-visible,.chip:focus-vis
 .vm .vj{display:flex;flex-wrap:wrap;gap:6px}
 .lb{display:block;font:600 10.5px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--soft);margin-bottom:6px}
 .wkd{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.dd{text-align:center;padding:6px 0;border-radius:8px;font:600 11.5px var(--mono);border:1px dashed var(--line);color:var(--soft);opacity:.55}
-.dd.on{opacity:1;background:var(--brand-bg);border:1px solid var(--brand);color:var(--brand)}
+.dd{text-align:center;padding:6px 0;border-radius:8px;font:600 11.5px var(--mono);border:1px solid transparent;background:var(--fill);color:var(--soft);opacity:.7}
+.dd.on{opacity:1;background:var(--brand);border-color:var(--brand);color:var(--on-brand)}
 .dd.sel{outline:2px solid var(--ink);outline-offset:1px}
 .wsum{font-size:12px;color:var(--soft);margin-top:7px}
 .bd{display:inline-block;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid var(--line);background:var(--fill);color:var(--ink);white-space:nowrap}
@@ -172,6 +172,31 @@ button:focus-visible,.icon-btn:focus-visible,nav a:focus-visible,.chip:focus-vis
 .item{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:9px 12px;margin:6px 0;background:var(--fill);border-radius:10px}
 .item>div:first-child{flex:1;min-width:180px}
 .item .chip{padding:3px 9px;font-size:12px;margin-right:2px}
+
+/* ---- Lista editable ---- */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 10px}
+.controls input[type=search]{flex:1 1 200px;width:auto;margin:0}
+.count-note{color:var(--soft);font-size:12.5px;margin:0 0 10px}
+.pagination{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.pg-info{color:var(--soft);font-size:12.5px}.pg-btns{display:flex;gap:6px}
+.tj{display:flex;gap:4px;flex-wrap:wrap}
+.etable{min-width:720px}
+.etable td{vertical-align:middle;padding:10px 12px}
+.etable td.nm b{display:block;font-weight:600}.etable td.nm small{font-size:12px}
+.etable .chip{padding:3px 9px;font-size:12px;margin-right:0}
+.etable tr.off td.nm,.etable tr.off td.dy{opacity:.55}
+.etable .sw{margin:0}
+@media screen and (max-width:680px){
+ .table-wrap.e{border:0;background:transparent;overflow:visible}
+ .etable{min-width:0;display:block}.etable thead{display:none}
+ .etable tbody{display:flex;flex-direction:column;gap:10px}
+ .etable tr{display:block;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px 14px;box-shadow:var(--shadow)}
+ .etable tr:hover{background:var(--card)}
+ .etable td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;border-bottom:1px dashed var(--line);padding:9px 0}
+ .etable td:last-child{border-bottom:0}
+ .etable td::before{content:attr(data-label);font:700 10px var(--mono);text-transform:uppercase;letter-spacing:.06em;color:var(--soft);flex:none}
+ .etable td.nm{display:block}.etable td.nm::before{content:none}
+}
 
 /* ---- Tabla ---- */
 .table-wrap{overflow:auto;border:1px solid var(--line);border-radius:10px;background:var(--card)}

@@ -19,6 +19,8 @@ td.hr .tag{margin-top:5px;display:block;width:max-content}
 td b{font-weight:600}.cap{display:block;font-size:12px;color:var(--soft);margin-top:3px;line-height:1.4}
 td select,td input.ed{width:100%}td input.ed.hora{width:92px;font:600 14px var(--mono)}td input.ed.terr{width:84px;text-align:center;font:600 13px var(--mono)}
 td .tag{font-size:11.5px}
+tr.more td{border-bottom-color:transparent;padding-bottom:4px}
+tr.cont td{padding-top:4px}
 @media screen and (max-width:680px){
  .table-wrap{border:0;background:transparent;overflow:visible}
  table{min-width:0;display:block}thead{display:none}
@@ -34,6 +36,8 @@ td .tag{font-size:11.5px}
  td:empty{display:none}
  td select,td input.ed{max-width:60%}
  table.em td>*:not(.cap){text-align:left}
+ tbody tr.more td,tbody tr.cont td{padding:9px 0}
+ tbody tr.more td:not(:last-child){border-bottom:1px dashed var(--line)}
 }
 @media print{
  .ph{display:block;text-align:center;margin-bottom:10px;font-size:15px}
@@ -137,13 +141,13 @@ function sel(f,r,list,ok,u,fl,cur0){
 }
 function weekHtml(k,i,uC,uH){
  const rows=wrows(k),hasPm=new Set(rows.filter(x=>x.hora>='14:00').map(x=>x.f)),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
- const body=rows.map(r=>{
+ const body=rows.map((r,ix)=>{
   const d=P(r.f),dow=d.getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
-  const first=r.f!=pd;pd=r.f;
+  const first=r.f!=pd;pd=r.f;const nx=rows[ix+1]?.f==r.f;
   const day=`<span class=dl><span class=dn>${String(d.getDate()).padStart(2,'0')}</span><span class=dw>${d.toLocaleDateString('es-CL',{weekday:'long'})}</span></span>`;
   const addPm=EM&&first&&!hasPm.has(r.f)?`<br><button class="mini noprint" data-pm="${r.f}" title="Añadir salida en la tarde">+ Tarde</button>`:'';
   let hc='',cc='',tc='',ac='';
-  hc=`<span class=tx><b class=hv>${esc(r.hora)}</b></span>${EM?`<input class="ed hora" data-r=${r.id} data-f=hora value="${esc(r.hora)}">`:''}${r.g?`<span class=cap>Grupo ${r.g}</span>`:''}<span class="tag ${t=='M'?'am':'pm'}">${t=='M'?'Mañana':'Tarde'}</span>`;
+  hc=`<span class=tx><b class=hv>${esc(r.hora)}</b></span>${EM?`<input class="ed hora" data-r=${r.id} data-f=hora value="${esc(r.hora)}">`:''}${r.g?`<span class=cap>Grupo ${r.g}</span>`:''}`;
   if(EM){
    const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
    ac=`<span class=tx>${h?`<b>${esc(h.nombre)}</b>`:'<span class=mut>Sin encargado</span>'}</span>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class="cap ed">${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span>`;
@@ -154,7 +158,7 @@ function weekHtml(k,i,uC,uH){
    cc=`<span class=tx>${c?`<b>${esc(c.nombre)}</b><span class=cap>${esc(c.dir)}</span>`:'<span class=mut>Sin casa</span>'}</span>`;
    tc=`<span class=tx>${r.terr?`<span class="tag active">${esc(r.terr)}</span>`:'<span class=mut>—</span>'}</span>`;
   }
-  return `<tr class="${t=='M'?'am':'pm'}${first?' first':''}"><td class="day${first?'':' rep'}" data-label="Fecha">${day}${addPm}</td>
+  return `<tr class="${t=='M'?'am':'pm'}${first?' first':''}${first?'':' cont'}${nx?' more':''}"><td class="day${first?'':' rep'}" data-label="Fecha">${day}${addPm}</td>
   <td class=hr data-label="Hora">${hc}</td><td data-label="Encargado">${ac}</td><td data-label="Lugar">${cc}</td><td data-label="Territorio">${tc}</td>${EM?`<td class=noprint data-label=""><button class="small danger" data-del=${r.id} title="Quitar fila">✕</button></td>`:''}</tr>`;}).join('');
  return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación · ${mname(MES)}</div>
  <div class=wh><div><span class=eyebrow>Semana ${i+1}</span><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2></div><span class=noprint>${EM?`<button data-add=${i}>+ Fila</button> `:''}<button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
