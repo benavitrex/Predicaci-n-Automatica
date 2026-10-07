@@ -7,7 +7,8 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 @media print{.ph{display:block;text-align:center;margin-bottom:8px}.pt{display:block}td select,.hint{display:none!important}.wk{display:block!important;box-shadow:none;border:0;page-break-after:always}.one .wk:not(.pr){display:none!important}td input{border:0;background:none;color:#000;padding:0}}
 </style></head><body>
 <main>
-<section class="card noprint"><h2>Programa mensual</h2>
+<div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>mensual</em></h1><p class="sub">Elige el mes: la página asigna según la disponibilidad y el historial, y lo deja listo para imprimir.</p></div>
+<section class="card noprint"><h2>1 · Elegir el mes</h2>
  <form id="f" style="padding:0">
   <label class="chk">Mes <input type="month" id="mes" required></label>
   <button class="pri">Generar / regenerar</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
@@ -16,7 +17,7 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 </section>
 <div id="tabs" class="fl noprint"></div>
 <div id="weeks"></div>
-<section class="card noprint"><h2>Historial</h2><div id="hist"></div>
+<section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><div id="hist"></div>
  <small>Los meses guardados alimentan la rotación: quien tuvo más salidas queda de último y no se repite lo del mes anterior.</small><div class="grid" id="uso"></div></section>
 </main>
 <script src="app.js"></script>

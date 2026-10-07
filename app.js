@@ -65,6 +65,8 @@ small{color:var(--mut)}.chip{display:inline-block;padding:3px 10px;border:1px so
 table{width:100%;border-collapse:collapse;background:var(--card);border-radius:14px;overflow:hidden;box-shadow:var(--sh)}th,td{border:1px solid var(--ln);padding:6px 8px;text-align:left;vertical-align:top}th{background:var(--bg)}
 td select{width:100%}.warn{color:var(--bad)}#msg{position:fixed;bottom:16px;right:16px;background:var(--ac2);color:#fff;padding:10px 14px;border-radius:10px;display:none}
 dialog{border:1px solid var(--ln);border-radius:14px;background:var(--card);color:var(--fg)}dialog label{display:block;margin:8px 0}dialog input{width:100%}
+.hero{padding:26px 0 10px}.eyebrow{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ac);font-weight:600;margin-bottom:2px}
+.hero h1{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:4px 0 6px;letter-spacing:-.02em}.hero h1 em{color:var(--ac);font-style:italic;font-weight:600}.sub{color:var(--mut);margin:0 0 12px}
 [hidden]{display:none!important}
 @media print{header.top,.skip,.noprint,#msg{display:none!important}body{background:#fff;color:#000}td select{border:0;background:none;appearance:none;color:#000;padding:0}}
 </style>`);
