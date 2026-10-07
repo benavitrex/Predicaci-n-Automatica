@@ -57,19 +57,19 @@ const isPre=s=>s.startsWith('PR')||s=='PE'||s=='PA';
 const rk=x=>{const t=(x.tarea||'').split('/').map(s=>s.trim().toUpperCase()),an=t.includes('AN'),sm=t.includes('SM'),pre=t.some(isPre);return{AN:an,SM:sm,PRE:pre,PUB:!an&&!sm&&!pre,main:an?'AN':sm?'SM':pre?'PRE':'PUB'};};
 const chips=(arr,cur,a)=>arr.map(([v,l])=>`<span class="chip ${cur==v?'on':''}" data-${a}="${v}" tabindex=0>${l}</span>`).join('');
 const TURNOS=[['','Todos'],['M','☀ Mañana'],['T','🌙 Tarde']];
+const dtxt=x=>ORDEN.every(d=>x.dias.includes(d))?'Todos los días':ORDEN.filter(d=>x.dias.includes(d)).map(d=>DIAS[d].slice(0,3)).join(', ');
+const ttxt=x=>TN[x.turno]||TN.MT;
 function cards(){
  const D=[['-1','Todos']].concat(ORDEN.map(d=>[String(d),DIAS[d].slice(0,3)]));
  $('#fcd').innerHTML=chips(D,fd,'fd');$('#fvd').innerHTML=chips(D,fv,'fv');
  $('#fct').innerHTML=chips(TURNOS,ft,'ft');$('#fvt').innerHTML=chips(TURNOS,fvt,'fvt');
  $('#fvr').innerHTML=chips([['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']],fr,'fr');
  const n1=q1.trim().toLowerCase(),n2=q2.trim().toLowerCase(),ord={AN:0,SM:1,PRE:2,PUB:3};
- const C=DB.casas.filter(x=>x.activa!==false&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+ const C=DB.casas.filter(x=>(AUTH||x.activa!==false)&&(fd<0||x.dias.includes(fd))&&(!ft||turnoOk(x.turno,ft))&&(!n1||(x.nombre+' '+(x.dir||'')+' '+(x.terr||'')).toLowerCase().includes(n1))).sort((a,b)=>(a.activa===false)-(b.activa===false)||a.nombre.localeCompare(b.nombre));
  const V=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&(fv<0||x.dias.includes(fv))&&(!fvt||turnoOk(x.turno,fvt))&&(!fr||rk(x)[fr])&&(!n2||x.nombre.toLowerCase().includes(n2))).sort((a,b)=>ord[rk(a).main]-ord[rk(b).main]||a.nombre.localeCompare(b.nombre));
- $('#nc').textContent=C.length;$('#nv').textContent=V.length;
- $('#lc0').innerHTML=C.length?`<div class=cg>${C.map(x=>`<article class=cc><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span></article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>';
- $('#lv0').innerHTML=V.length?`<div class=cg>${V.map(x=>`<article class="vc r-${rk(x).main}"><div class=vh><b>${esc(x.nombre)}</b><span class="tag rg">${rango(x.tarea)}</span></div>
-  <div><span class=lb>Días disponibles</span><div class=vd>${ORDEN.map(d=>`<span class="dd ${x.dias.includes(d)?'on':''} ${d==fv?'sel':''}">${DIAS[d].slice(0,2)}</span>`).join('')}</div></div>
-  <div><span class=lb>Saca grupo en</span><div class=vt><span class="tg ${turnoOk(x.turno,'M')?'on':''}">☀ Mañana</span><span class="tg ${turnoOk(x.turno,'T')?'on':''}">🌙 Tarde</span></div></div></article>`).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
+ $('#nc').textContent=C.filter(x=>x.activa!==false).length;$('#nv').textContent=V.length;
+ $('#lc0').innerHTML=(AUTH?'<p class=sub style="margin:6px 0 0">Usa el interruptor para pausar una casa: mientras esté en pausa, el programa no la usa.</p>':'')+(C.length?`<div class=cg>${C.map(x=>`<article class="cc ${x.activa===false?'off':''}"><b>${esc(x.nombre)}</b><span class=ad>📍 ${esc(x.dir||'Sin dirección')}</span><span class="tag acc">Territorio ${esc(x.terr||'—')}</span>${AUTH?`<label class=sw><input type=checkbox data-ca=${x.id} ${x.activa===false?'':'checked'}><i></i><span>${x.activa===false?'En pausa':'Activa'}</span></label>`:''}</article>`).join('')}</div>`:'<p class=sub>Ninguna casa coincide con estos filtros.</p>');
+ $('#lv0').innerHTML=V.length?`<div class=cg>${V.map(x=>`<details class="vc r-${rk(x).main}"><summary><div class=vh><b>${esc(x.nombre)}</b><span class="tag rg">${rango(x.tarea)}</span></div><span class=vs>${dtxt(x)} · ${ttxt(x)}</span></summary><div class=vi><div><span class=lb>Días en que puede</span><div class=dl>${ORDEN.map(d=>`<span class="${x.dias.includes(d)?'on':''} ${d==fv?'sel':''}">${DIAS[d].slice(0,2)}</span>`).join('')}</div></div><div><span class=lb>Turno</span><span>${ttxt(x)}</span></div></div></details>`).join('')}</div>`:'<p class=sub>Nadie coincide con estos filtros.</p>';
 }
 function item(k,x){
  const h=k=='hermanos',g=!h||x.grupo;
@@ -103,6 +103,7 @@ document.addEventListener('click',e=>{
  if(ds.del!==undefined&&confirm('¿Eliminar '+x.nombre+'?')){arr.splice(arr.indexOf(x),1);render();dirty();}
 });
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip')&&!e.target.closest('.item'))e.target.click();});
+document.addEventListener('change',e=>{const id=e.target.dataset?.ca;if(id===undefined||!AUTH)return;const x=DB.casas.find(c=>c.id==id);if(x){x.activa=e.target.checked;render();dirty();}});
 document.addEventListener('change',e=>{
  const r=find(e.target);if(!r||!AUTH)return;const x=r[1],ds=e.target.dataset;
  if('g' in ds){x.grupo=e.target.checked;if(x.grupo&&!x.dias.length)x.dias=[...ORDEN];render();}

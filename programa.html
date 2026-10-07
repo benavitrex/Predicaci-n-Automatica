@@ -13,7 +13,7 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
   <label class="chk">Mes <input type="month" id="mes" required></label>
   <button class="pri">Generar / regenerar</button><button type="button" id="sv">Guardar en historial</button><button type="button" id="pm">Imprimir mes</button>
  </form><small id="st"></small>
- <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><div id="hor" class="hg"></div></details>
+ <details style="margin-top:8px"><summary>Horarios por día (hora y salidas por horario)</summary><small class=hint style="margin-top:6px">La tarde se puede marcar en cualquier día. Por defecto el programa solo la genera miércoles y viernes; en cualquier otro día puedes añadirla desde el programa con «+ Tarde».</small><div id="hor" class="hg"></div></details>
 </section>
 <div id="mh" class="mh noprint"></div>
 <div id="tabs" class="fl noprint"></div>
@@ -23,7 +23,7 @@ td.day{font-weight:700;white-space:nowrap}td input{width:100%}td.hr{width:90px}.
 </main>
 <script src="app.js"></script>
 <script>
-shell('p');
+shell('p');document.body.classList.add('pg');
 const uid=()=>Math.random().toString(36).slice(2,9);
 const H=JSON.parse(localStorage.getItem('pj_hor')||'null')||{0:['10:30',1],1:['10:00',1],2:['10:00',1],3:['10:00, 18:00',1],4:['10:00',1],5:['10:00, 18:00',1],6:['10:30',1]};
 $('#hor').innerHTML=ORDEN.map(d=>`<div><b>${DIAS[d]}</b><br><input data-h=${d} value="${H[d][0]}" size=11 placeholder="10:00, 18:00"> <input data-n=${d} type=number min=0 max=6 value=${H[d][1]} style="width:52px" title="Salidas por horario"><br><label class=chk><input type=checkbox data-tt=${d} ${/\b(1[4-9]|2\d):/.test(H[d][0])?'checked':''}>Salida en la tarde (18:00)</label></div>`).join('');
@@ -73,15 +73,15 @@ function sel(f,r,list,ok,u,fl,cur0){
  return `<select data-r=${r.id} data-f=${f}><option value="">— sin asignar —</option>${grp('✓ Recomendados (disponibles ese día)',okS,cur0,u,fl)}${grp('Otros',rest,cur0,u,fl)}</select>`;
 }
 function weekHtml(k,i,uC,uH){
- const rows=wrows(k),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
+ const rows=wrows(k),hasPm=new Set(rows.filter(x=>x.hora>='14:00').map(x=>x.f)),lastC=new Set((hist()[prevKey(MES)]?.rows||[]).map(r=>r.c));let pd='';
  const body=rows.map(r=>{
   const dow=P(r.f).getDay(),t=r.hora<'14:00'?'M':'T',c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
   const okC=DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t)),okH=DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,t));
   const first=r.f!=pd;pd=r.f;
-  return `<tr class="${t=='M'?'am':'pm'}"><td class=day>${first?P(r.f).toLocaleDateString('es-CL',{weekday:'long',day:'2-digit'}).toUpperCase():''}</td>
+  return `<tr class="${t=='M'?'am':'pm'}"><td class=day>${first?P(r.f).toLocaleDateString('es-CL',{weekday:'long',day:'2-digit'}).toUpperCase()+(hasPm.has(r.f)?'':`<br><button class="mini noprint" data-pm="${r.f}" title="Añadir salida en la tarde">+ Tarde</button>`):''}</td>
   <td class=hr><input data-r=${r.id} data-f=hora value="${esc(r.hora)}">${r.g?`<small class=hint>Grupo ${r.g}</small>`:''}</td>
   <td>${sel('h',r,DB.hermanos.filter(x=>x.grupo),okH,uH,null,r.h)}<span class=pt>${esc(h?.nombre||'')}</span><span class=hint>${h?'Saca grupo: '+dabbr(h.dias):'Sin encargado disponible'}</span></td>
-  <td>${sel('c',r,DB.casas,okC,uC,lastC,r.c)}<span class=pt>${esc(c?c.nombre+' — '+c.dir:'')}</span><span class=hint>${c?esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span></td>
+  <td>${sel('c',r,DB.casas.filter(x=>x.activa!==false||x.id==r.c),okC,uC,lastC,r.c)}<span class=pt>${esc(c?c.nombre+' — '+c.dir:'')}</span><span class=hint>${c?(c.activa===false?'⚠ Casa en pausa · ':'')+esc(c.dir)+' · Disp.: '+dabbr(c.dias):'Sin casa disponible'}</span></td>
   <td class=hr><input data-r=${r.id} data-f=terr value="${esc(r.terr)}"></td><td class=noprint><button data-del=${r.id} title="Quitar fila">✕</button></td></tr>`;}).join('');
  return `<section class="card wk ${i==cur?'cur':''}"><div class="ph"><b>Congregación Curauma</b> · Programa de predicación · ${mname(MES)}</div>
  <div class=wh><h2>Semana del ${lab(k)} <small>${mname(MES)}</small></h2><span class=noprint><button data-add=${i}>+ Fila</button> <button data-send=${i}>Enviar</button> <button data-pdf=${i} class=pri>PDF</button></span></div>
@@ -95,12 +95,21 @@ function render(){
  const ks=Object.keys(hist()).sort().reverse();
  $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow>${k.slice(0,4)}</span><b>${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button><button data-hd=${k} title="Eliminar del archivo">✕</button></div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
 }
+function addPm(f){
+ const dow=P(f).getDay(),[uC,uH]=counts(),used=ROWS.filter(r=>r.f==f&&r.hora=='18:00'),uc=new Set(used.map(r=>r.c)),uh=new Set(used.map(r=>r.h));
+ const c=best(DB.casas.filter(x=>x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,'T')&&!uc.has(x.id)),x=>uC[x.id]||0,{});
+ const h=best(DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.dias.includes(dow)&&turnoOk(x.turno,'T')&&!uh.has(x.id)),x=>uH[x.id]||0,{});
+ const tc={};ROWS.forEach(r=>{if(r.terr)tc[r.terr]=(tc[r.terr]||0)+1;});
+ const terr=c?(c.cerca?.length?c.cerca:[c.terr]).map(String).sort((x,y)=>(tc[x]||0)-(tc[y]||0))[0]:'';
+ ROWS.push({id:uid(),f,hora:'18:00',g:0,c:c?.id||'',h:h?.id||'',terr});
+}
 const txt=i=>`Programa de predicación — Congregación Curauma\nSemana del ${lab(WK[i])}\n`+wrows(WK[i]).map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);
  return `${P(r.f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit'})} ${r.hora}${r.g?' (G'+r.g+')':''} · ${h?.nombre||'—'} · ${c?c.nombre+' ('+c.dir+')':'—'}${r.terr?' · Terr. '+r.terr:''}`;}).join('\n');
 $('#weeks').onchange=e=>{const t=e.target,r=ROWS.find(x=>x.id==t.dataset.r),f=t.dataset.f;if(!r)return;r[f]=t.value;
- if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.cerca?.[0]||DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h')render();$('#st').textContent='Cambios sin guardar en el historial.';};
+ if(f=='c')r.terr=DB.casas.find(x=>x.id==t.value)?.cerca?.[0]||DB.casas.find(x=>x.id==t.value)?.terr||'';if(f=='c'||f=='h'||f=='hora')render();$('#st').textContent='Cambios sin guardar en el historial.';};
 document.addEventListener('click',async e=>{const d=e.target.dataset||{};
  if(d.w!==undefined){cur=+d.w;render();}
+ if(d.pm){addPm(d.pm);render();$('#st').textContent='Cambios sin guardar en el historial.';}
  if(d.del){ROWS=ROWS.filter(r=>r.id!=d.del);render();}
  if(d.add!==undefined){const f=prompt('Fecha de la nueva fila (AAAA-MM-DD)',wrows(WK[d.add])[0]?.f||'');if(f)ROWS.push({id:uid(),f,hora:'10:00',g:0,c:'',h:'',terr:''});render();}
  if(d.pdf!==undefined){document.body.classList.add('one');document.querySelectorAll('.wk').forEach((w,j)=>w.classList.toggle('pr',j==+d.pdf));print();}
