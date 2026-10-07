@@ -852,7 +852,15 @@
       "gr": "5",
       "turno": "MT",
       "grupo": false,
-      "dias": [],
+      "dias": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        0
+      ],
       "activa": true
     },
     {
