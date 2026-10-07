@@ -57,6 +57,20 @@ tr.cont td{padding-top:4px}
  .wh .eyebrow{display:none}
  .mut{color:#555}
 }
+
+.kp{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin:12px 0}
+.kp>div{background:var(--fill);border-radius:10px;padding:10px 12px}.kp b{display:block;font:600 26px/1.1 var(--serif)}.kp span{font:600 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--soft)}
+.kp .ok b{color:var(--brand)}.kp .no b{color:var(--bad)}.kp .pe b{color:var(--gold)}
+.pie{display:flex;flex-wrap:wrap;gap:20px;align-items:center;margin:8px 0}.pie svg{width:160px;height:160px;flex:none;border-radius:50%;background:var(--fill)}
+.lgd{display:flex;flex-direction:column;gap:7px;font-size:13px}.lgd i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:8px}
+.sb{display:flex;flex-wrap:wrap;gap:6px}.sb button.on-ok{background:var(--brand);border-color:var(--brand);color:var(--on-brand)}.sb button.on-no{background:var(--bad);border-color:var(--bad);color:#fff}
+.rpl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.rpl select{max-width:220px}.rpl input{flex:1 1 140px}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:12px}.cols3>div{background:var(--fill);border-radius:10px;padding:10px 12px}.cols3 h3{margin:0 0 8px}
+.pl{display:inline-flex;gap:6px;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:600;border:1px solid var(--line);background:var(--card);cursor:pointer;margin:0 4px 5px 0}.pl em{font:600 11px var(--mono);font-style:normal;color:var(--soft)}
+.pl.ok{border-color:var(--brand);color:var(--brand)}.pl.no{border-color:var(--bad);color:var(--bad)}.pl.pe{border-color:var(--gold);color:var(--gold)}
+.mbar{display:grid;grid-template-columns:120px 1fr 90px;gap:10px;align-items:center;margin:7px 0;font-size:12.5px;cursor:pointer;text-transform:capitalize}.mbar>i{display:block;height:10px;border-radius:99px;background:var(--bad-bg);overflow:hidden}.mbar>i>u{display:block;height:100%;background:var(--brand)}.mbar small{text-transform:none}
+.dayrow{display:flex;flex-wrap:wrap;gap:2px 12px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:13px}.dayrow:last-child{border-bottom:0}.dayrow b{min-width:120px;text-transform:capitalize}
+.tag.bad{background:var(--bad-bg);color:var(--bad)}.tag.gold{background:var(--gold-bg);color:var(--gold)}
 </style></head><body>
 <main>
 <div class="hero noprint"><span class="eyebrow">Predicación</span><h1>Programa <em>Predicación</em></h1><p class="sub">Elige el mes para ver el programa. Si tienes acceso de edición, puedes generarlo y ajustarlo.</p></div>
@@ -77,6 +91,19 @@ tr.cont td{padding-top:4px}
 <div id="tabs" class="fl noprint"></div>
 <div id="weeks"></div>
 <section class="card noprint"><span class="eyebrow">Rotación</span><h2>Historial</h2><p class="hint">Archivo de meses guardados. Abre uno para revisarlo; el mes anterior se usa para no repetir asignaciones.</p><div id="hist"></div></section>
+<section class="card noprint" id="seg"><span class="eyebrow">Seguimiento</span><h2>Cumplimiento de asignaciones</h2><p class="hint">Elige un mes guardado y marca si cada hermano cumplió su salida o no. Si falló, puedes indicar quién lo reemplazó. Al terminar pulsa «Guardar seguimiento».</p>
+ <div id="smo" class="fl"></div>
+ <div id="sbar" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 12px"></div>
+ <div id="stb"></div></section>
+<section class="card noprint" id="est"><span class="eyebrow">Estadísticas</span><h2>Centro de estadísticas</h2><p class="hint">Resumen general con filtros: elige período, rango y resultado para ver quiénes cumplieron, quiénes fallaron y quiénes están pendientes. Toca un nombre para abrir su ficha.</p>
+ <div class="frow"><span class="fl-l">Período</span><div class="fl" id="f_per"></div></div>
+ <div class="frow"><span class="fl-l">Rango</span><div class="fl" id="f_rg"></div></div>
+ <div class="frow"><span class="fl-l">Ver</span><div class="fl" id="f_res"></div></div>
+ <div id="e_kp"></div><div class="pie" id="e_pie"></div><div class="cols3" id="e_lists"></div>
+ <h3 style="margin-top:24px">Cumplimiento por mes</h3><div id="e_mes"></div></section>
+<section class="card noprint" id="fic"><span class="eyebrow">Ficha</span><h2>Ficha por hermano</h2><p class="hint">Escribe o elige un nombre para ver su historial de cumplimiento, útil cuando alguien reclama que no lo pusieron en el programa.</p>
+ <form onsubmit="return false"><input id="fbIn" list="fbList" placeholder="Nombre del hermano…" style="flex:1 1 240px"><datalist id="fbList"></datalist><button type="button" id="fbClr" class="ghost">Limpiar</button></form>
+ <div class="grid" id="fres"></div></section>
 </main>
 
 <div class="edit-bar noprint" id="editBar" hidden role="toolbar" aria-label="Edición">
@@ -175,7 +202,7 @@ function gen(keep,only,force){
  if(!keep||nn)chg(keep?nn+' salida(s) agregada(s); lo demás quedó igual. Sin guardar.':'Programa regenerado desde cero, sin guardar. Revísalo y edita lo que haga falta.');
  else $('#st').textContent='No falta ninguna salida según los horarios.';
 }
-function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:uid(),f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,h:r.h,terr:r.terr}));cur=0;render();clean('Mes guardado en el historial.');}
+function openMonth(k){MES=k;$('#mes').value=k;ROWS=hist()[k].rows.map(r=>({id:r.id||uid(),f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,h:r.h,terr:r.terr,st:r.st||'',rp:r.rp||'',nt:r.nt||''}));cur=0;render();clean('Mes guardado en el historial.');}
 function emptyMonth(){ROWS=[];cur=0;render();clean('');}
 
 const lab=(k,s)=>{const[y,m]=MES.split('-').map(Number),e=k==3?new Date(y,m,0).getDate():k*7+7;return (k*7+1)+' al '+e+(s?'':' de '+new Date(y,m-1,1).toLocaleDateString('es-CL',{month:'long'}));};
@@ -221,6 +248,7 @@ function render(){
  $('#weeks').innerHTML=has?WK.map((k,i)=>weekHtml(k,i,uC,uH)).join(''):`<section class="card"><p class="hint" style="margin:0">${!MES?'Elige un mes para ver el programa.':EM?'No hay salidas con los horarios actuales.':'Aún no hay un programa guardado para este mes.'}</p></section>`;
  const ks=Object.keys(hist()).sort().reverse();
  $('#hist').innerHTML=ks.length?`<div class="cg arch">${ks.map(k=>{const v=hist()[k];return `<article class=cc><span class=eyebrow style="margin:0">${k.slice(0,4)}</span><b style="text-transform:capitalize;font-family:var(--serif);font-size:18px">${mname(k)}</b><small>${v.rows.length} salidas · guardado el ${new Date(v.guardado||Date.now()).toLocaleDateString('es-CL')}</small><div style="display:flex;gap:6px"><button data-open=${k} class=pri>Abrir</button>${EM?`<button data-hd=${k} class=danger title="Eliminar del archivo">✕</button>`:''}</div></article>`;}).join('')}</div>`:'<small>Aún no hay meses guardados.</small>';
+ segAll();
 }
 function toggleGS(f,mode){
  ROWS=mode=='n'?ROWS.filter(r=>!(r.f==f&&r.gs)):ROWS.filter(r=>!(r.f==f&&r.hora<'14:00'));
@@ -258,7 +286,7 @@ document.addEventListener('click',async e=>{const d=e.target.dataset||{};
 addEventListener('afterprint',()=>document.body.classList.remove('one'));
 $('#pm').onclick=()=>print();
 $('#sv').onclick=async()=>{if(!AUTH)return;if(!ROWS.length)return toast('Genera un mes primero');
- hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr};})};
+ hist()[MES]={guardado:new Date().toISOString(),rows:ROWS.map(r=>{const c=DB.casas.find(x=>x.id==r.c),h=DB.hermanos.find(x=>x.id==r.h);return{id:r.id,f:r.f,hora:r.hora,g:r.g,gs:r.gs,c:r.c,cn:c?.nombre||'',dir:c?.dir||'',h:r.h,hn:h?.nombre||'',terr:r.terr,...(r.st?{st:r.st}:{}),...(r.rp?{rp:r.rp}:{}),...(r.nt?{nt:r.nt}:{})};})};
  localStorage.setItem('pj_hist',JSON.stringify(hist()));
  $('#sv').disabled=true;$('#st').className='save-status';$('#st').textContent='Guardando…';
  try{await save('Guarda programa '+MES);toast('Guardado en el historial (GitHub) ✓','ok');clean('Guardado ✓','ok');}
@@ -275,12 +303,103 @@ $('#editModeBtn').onclick=()=>{
  toast(EM?'Modo edición activado — puedes editar el programa':'Modo edición desactivado',EM?'ok':'');
 };
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.classList.contains('chip'))e.target.click();});
+
+/* ---------- Seguimiento y estadísticas ---------- */
+const RGN=[['','Todos'],['AN','Ancianos'],['SM','Siervos ministeriales'],['PRE','Precursores'],['PUB','Publicadores']];
+const rkOf=b=>{const t=((b&&b.tarea)||'').split('/').map(x=>x.trim().toUpperCase());return t.includes('AN')?'AN':t.includes('SM')?'SM':t.some(x=>x.startsWith('PR')||x=='PE'||x=='PA')?'PRE':'PUB';};
+let SK='',SF={per:'mes',rg:'',res:''},FB='',sdirty=false;
+const bro=id=>DB.hermanos.find(x=>x.id==id),bname=r=>bro(r.h)?.nombre||r.hn||'—',bn2=id=>bro(id)?.nombre||'—';
+const fdate=f=>P(f).toLocaleDateString('es-CL',{weekday:'short',day:'2-digit',month:'short'});
+const skey=()=>{const ks=Object.keys(hist()).sort();if(!hist()[SK])SK=hist()[MES]?MES:ks[ks.length-1]||'';return SK;};
+function normIds(){for(const k in hist())hist()[k].rows.forEach(r=>{if(!r.id)r.id=uid();});}
+const pool=per=>(per=='mes'?[skey()]:Object.keys(hist()).sort()).filter(k=>hist()[k]).flatMap(k=>hist()[k].rows.filter(r=>r.h).map(r=>({k,r})));
+const pct=(a,b)=>a+b?Math.round(a/(a+b)*100):null;
+const chipsH=(arr,cur,a)=>arr.map(([v,l])=>`<span class="chip ${cur==v?'on':''}" data-${a}="${v}" tabindex=0>${l}</span>`).join('');
+function pie(ok,no,pe){
+ const t=ok+no+pe;if(!t)return '<svg viewBox="0 0 42 42"></svg>';
+ let o=0;const seg=[[ok,'var(--brand)'],[no,'var(--bad)'],[pe,'var(--gold)']].filter(x=>x[0]).map(([n,c])=>{const p=n/t*100,e=`<circle cx=21 cy=21 r=10.5 fill=none stroke="${c}" stroke-width=21 pathLength=100 stroke-dasharray="${p} ${100-p}" stroke-dashoffset="${-o}"/>`;o+=p;return e;}).join('');
+ return `<svg viewBox="0 0 42 42" role="img" aria-label="Gráfico de torta"><g transform="rotate(-90 21 21)">${seg}</g></svg>`;
+}
+const legend=(ok,no,pe)=>{const t=ok+no+pe,p=n=>t?Math.round(n/t*100)+'%':'0%';return `<div class=lgd><span><i style="background:var(--brand)"></i><b>${ok}</b> cumplió · ${p(ok)}</span><span><i style="background:var(--bad)"></i><b>${no}</b> no cumplió · ${p(no)}</span><span><i style="background:var(--gold)"></i><b>${pe}</b> pendiente · ${p(pe)}</span></div>`;};
+const kpis=(n,ok,no,pe,extra)=>{const c=pct(ok,no);return `<div class=kp><div><b>${n}</b><span>Asignaciones</span></div><div class=ok><b>${ok}</b><span>Cumplieron</span></div><div class=no><b>${no}</b><span>Fallaron</span></div><div class=pe><b>${pe}</b><span>Pendientes</span></div><div><b>${c===null?'—':c+'%'}</b><span>Cumplimiento</span></div>${extra||''}</div>`;};
+
+function findRow(id){for(const k in hist()){const r=hist()[k].rows.find(x=>x.id==id);if(r)return{k,r};}return null;}
+function setSt(id,p){
+ const f=findRow(id);if(!f)return;Object.assign(f.r,p);
+ for(const key of['st','rp','nt'])if(!f.r[key])delete f.r[key];
+ if(f.k==MES){const q=ROWS.find(x=>x.id==id);if(q)Object.assign(q,{st:f.r.st||'',rp:f.r.rp||'',nt:f.r.nt||''});}
+ localStorage.setItem('pj_hist',JSON.stringify(hist()));
+ sdirty=true;segAll();
+}
+addEventListener('beforeunload',e=>{if(sdirty){e.preventDefault();e.returnValue='';}});
+
+function segRender(){
+ const ks=Object.keys(hist()).sort().reverse(),k=skey();
+ $('#smo').innerHTML=ks.length?chipsH(ks.map(m=>[m,mname(m)]),k,'smo'):'<small>Aún no hay meses guardados. Guarda un programa en el historial para hacer su seguimiento.</small>';
+ const rows=k?hist()[k].rows.filter(r=>r.h).slice().sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora)):[],today=iso(new Date());
+ const ok=rows.filter(r=>r.st=='ok').length,no=rows.filter(r=>r.st=='no').length,pe=rows.length-ok-no;
+ $('#sbar').innerHTML=k?`<span class=bd>${ok} ✓</span><span class=bd>${no} ✕</span><span class=bd>${pe} pendientes</span><span class=sp></span>${AUTH?`<button data-bulk=1 title="Marca como cumplidas las salidas pendientes hasta hoy">Marcar pendientes como cumplidos</button><button class=pri id=ssv ${sdirty?'':'disabled'}>Guardar seguimiento</button>`:'<small>🔒 Solo lectura · para marcar necesitas edición habilitada</small>'}`:'';
+ const opts=r=>DB.hermanos.filter(x=>x.grupo&&x.activa!==false&&x.id!=r.h).sort((a,b)=>a.nombre.localeCompare(b.nombre)).map(x=>`<option value="${x.id}" ${x.id==r.rp?'selected':''}>${esc(x.nombre)}</option>`).join('');
+ $('#stb').innerHTML=rows.length?`<div class=table-wrap><table><thead><tr><th>Fecha</th><th>Hora</th><th>Encargado</th><th>Lugar</th><th>Resultado</th></tr></thead><tbody>${rows.map(r=>{
+  const st=r.st=='ok'?'<span class="tag active">✓ Cumplió</span>':r.st=='no'?'<span class="tag bad">✕ No cumplió</span>':'<span class="tag gold">Pendiente</span>';
+  const ctl=AUTH?`<div class=sb><button class="small ${r.st=='ok'?'on-ok':''}" data-sk="${r.id}|ok">✓ Cumplió</button><button class="small ${r.st=='no'?'on-no':''}" data-sk="${r.id}|no">✕ No cumplió</button>${r.st?`<button class="small ghost" data-sk="${r.id}|" title="Volver a pendiente">↺</button>`:''}</div>${r.st=='no'?`<div class=rpl><select data-rp="${r.id}"><option value="">— Reemplazo (opcional) —</option>${opts(r)}</select><input data-nt="${r.id}" placeholder="Nota (opcional)" value="${esc(r.nt||'')}"></div>`:''}`:st+(r.st=='no'&&(r.rp||r.nt)?`<span class=cap>${r.rp?'Reemplazo: '+esc(bn2(r.rp)):''}${r.nt?' · '+esc(r.nt):''}</span>`:'');
+  return `<tr><td data-label="Fecha"><b style="text-transform:capitalize">${fdate(r.f)}</b>${r.f>today?' <span class=mut>(próxima)</span>':''}</td><td data-label="Hora"><span class=hv>${esc(r.hora)}</span></td><td data-label="Encargado"><b>${esc(bname(r))}</b></td><td data-label="Lugar">${esc(r.cn||DB.casas.find(x=>x.id==r.c)?.nombre||'—')}</td><td data-label="Resultado">${ctl}</td></tr>`;}).join('')}</tbody></table></div>`:(k?'<small>Este mes no tiene salidas con encargado.</small>':'');
+}
+function estRender(){
+ $('#f_per').innerHTML=chipsH([['mes',skey()?mname(skey()):'Mes'],['all','Todo el historial']],SF.per,'sper');
+ $('#f_rg').innerHTML=chipsH(RGN,SF.rg,'srg');
+ $('#f_res').innerHTML=chipsH([['','Todos'],['ok','✓ Cumplieron'],['no','✕ Fallaron'],['pe','Pendientes']],SF.res,'sres');
+ const its=pool(SF.per).filter(({r})=>!SF.rg||rkOf(bro(r.h))==SF.rg),A={};
+ let ok=0,no=0,pe=0;
+ its.forEach(({r})=>{const a=A[r.h]||(A[r.h]={id:r.h,n:bname(r),ok:0,no:0,pe:0}),s=r.st=='ok'?'ok':r.st=='no'?'no':'pe';a[s]++;s=='ok'?ok++:s=='no'?no++:pe++;});
+ $('#e_kp').innerHTML=kpis(its.length,ok,no,pe);
+ $('#e_pie').innerHTML=its.length?pie(ok,no,pe)+legend(ok,no,pe):'<small>No hay asignaciones con estos filtros.</small>';
+ const L=[['ok','✓ Cumplieron'],['no','✕ Fallaron'],['pe','Pendientes']].filter(x=>!SF.res||SF.res==x[0]);
+ $('#e_lists').innerHTML=L.map(([key,t])=>{const l=Object.values(A).filter(a=>a[key]).sort((a,b)=>b[key]-a[key]||a.n.localeCompare(b.n));
+  return `<div><h3>${t} · ${l.length}</h3>${l.length?l.map(a=>`<span class="pl ${key}" data-fb="${a.id}" tabindex=0>${esc(a.n)}<em>${a[key]}</em></span>`).join(''):'<small>Nadie</small>'}</div>`;}).join('');
+ const ms=Object.keys(hist()).sort().reverse();
+ $('#e_mes').innerHTML=ms.map(k=>{let o=0,n=0,p=0;hist()[k].rows.filter(r=>r.h&&(!SF.rg||rkOf(bro(r.h))==SF.rg)).forEach(r=>r.st=='ok'?o++:r.st=='no'?n++:p++);const c=pct(o,n);
+  return `<div class=mbar data-smo2="${k}" title="Abrir seguimiento de este mes"><span>${mname(k)}</span><i><u style="width:${c||0}%"></u></i><span><b>${c===null?'—':c+'%'}</b> <small>${o}✓ ${n}✕ ${p}…</small></span></div>`;}).join('')||'<small>Sin meses guardados.</small>';
+}
+function ficRender(){
+ const ids=new Set();Object.values(hist()).forEach(v=>v.rows.forEach(r=>{if(r.h)ids.add(r.h);}));DB.hermanos.filter(x=>x.grupo).forEach(x=>ids.add(x.id));
+ $('#fbList').innerHTML=[...ids].map(bn2).filter(n=>n!='—').sort().map(n=>`<option value="${esc(n)}">`).join('');
+ if(!FB){$('#fres').innerHTML='<p class=hint style="margin:0">Elige un hermano para ver su seguimiento.</p>';return;}
+ const its=[];for(const k in hist())hist()[k].rows.forEach(r=>{if(r.h==FB)its.push(r);});its.sort((a,b)=>a.f.localeCompare(b.f)||a.hora.localeCompare(b.hora));
+ const ok=its.filter(r=>r.st=='ok'),no=its.filter(r=>r.st=='no'),pe=its.filter(r=>!r.st),rm=[];
+ for(const k in hist())hist()[k].rows.forEach(r=>{if(r.st=='no'&&r.rp==FB)rm.push(r);});
+ const b=bro(FB),dr=(r,x)=>`<div class=dayrow><b>${fdate(r.f)}</b><span class=hv>${esc(r.hora)}</span><span>${esc(r.cn||DB.casas.find(c=>c.id==r.c)?.nombre||'')}</span>${x||''}</div>`;
+ $('#fres').innerHTML=`<article class=card style="margin:0"><span class=eyebrow>Resumen</span><h2>${esc(bn2(FB))}</h2><small>${b?rango(b.tarea):''}${b?.gr?' · Grupo '+esc(b.gr):''}</small>
+  ${its.length?`<div class=pie>${pie(ok.length,no.length,pe.length)}${legend(ok.length,no.length,pe.length)}</div>`:'<p class=hint>Este hermano aún no tiene asignaciones en el historial.</p>'}
+  ${kpis(its.length,ok.length,no.length,pe.length,`<div><b>${rm.length}</b><span>Reemplazos hechos</span></div>`)}</article>
+ <article class=card style="margin:0"><span class=eyebrow>Detalle por día</span><h2>Días de cumplimiento</h2>
+  <h3 style="color:var(--brand)">✓ Días que cumplió · ${ok.length}</h3>${ok.map(r=>dr(r)).join('')||'<small>Ninguno aún</small>'}
+  <h3 style="color:var(--bad)">✕ Días que no cumplió · ${no.length}</h3>${no.map(r=>dr(r,`${r.rp?`<span class="tag bad">Reemplazó: ${esc(bn2(r.rp))}</span>`:''}${r.nt?`<span class=cap>${esc(r.nt)}</span>`:''}`)).join('')||'<small>Ninguno 🎉</small>'}
+  ${rm.length?`<h3>↺ Días que reemplazó a otro · ${rm.length}</h3>${rm.map(r=>dr(r,`<span class=mut>por ${esc(bname(r))}</span>`)).join('')}`:''}
+  ${pe.length?`<h3 style="color:var(--gold)">Pendientes · ${pe.length}</h3>${pe.map(r=>dr(r)).join('')}`:''}</article>`;
+}
+function segAll(){segRender();estRender();ficRender();}
+$('#seg').addEventListener('click',e=>{const d=e.target.dataset||{};
+ if(d.smo){SK=d.smo;segAll();}
+ if(d.sk&&AUTH){const[id,v]=d.sk.split('|');setSt(id,v?{st:v}:{st:'',rp:'',nt:''});}
+ if(d.bulk&&AUTH){const t=iso(new Date());let n=0;(hist()[skey()]?.rows||[]).forEach(r=>{if(r.h&&!r.st&&r.f<=t){r.st='ok';n++;const q=ROWS.find(x=>x.id==r.id);if(q)q.st='ok';}});if(n){localStorage.setItem('pj_hist',JSON.stringify(hist()));sdirty=true;segAll();toast(n+' marcadas como cumplidas');}else toast('No hay pendientes hasta hoy');}
+ if(e.target.id=='ssv'){(async()=>{try{await save('Seguimiento '+skey());sdirty=false;toast('Seguimiento guardado ✓','ok');}catch(x){toast('Solo guardado en este navegador: '+x.message,'err');}segAll();})();}
+});
+$('#seg').addEventListener('change',e=>{const d=e.target.dataset||{};if(!AUTH)return;if(d.rp!==undefined)setSt(d.rp,{rp:e.target.value});if(d.nt!==undefined)setSt(d.nt,{nt:e.target.value.trim()});});
+$('#est').addEventListener('click',e=>{const el=e.target.closest('[data-sper],[data-srg],[data-sres],[data-fb],[data-smo2]');if(!el)return;const d=el.dataset;
+ if(d.sper)SF.per=d.sper;else if(d.srg!==undefined)SF.rg=d.srg;else if(d.sres!==undefined)SF.res=d.sres;
+ else if(d.fb){FB=d.fb;$('#fbIn').value=bn2(FB);ficRender();$('#fic').scrollIntoView({behavior:'smooth'});return;}
+ else if(d.smo2){SK=d.smo2;segAll();$('#seg').scrollIntoView({behavior:'smooth'});return;}
+ estRender();});
+$('#fbIn').oninput=e=>{const v=e.target.value.trim().toLowerCase(),h=DB.hermanos.find(x=>x.nombre.toLowerCase()==v);if(h){FB=h.id;ficRender();}};
+$('#fbClr').onclick=()=>{FB='';$('#fbIn').value='';ficRender();};
+
 load().then(async()=>{
  AUTH=await auth();
  $('#who').textContent=AUTH?'🔓 Edición habilitada':(cfg().token?'⚠ Token inválido o sin permiso · solo lectura':'🔒 Solo lectura');
  if(!AUTH&&cfg().token)toast('Token inválido o sin permiso · solo lectura','err');
  $('#editBar').hidden=!AUTH;
- const Lc=JSON.parse(localStorage.getItem('pj_hist')||'{}');for(const k in Lc)if(!hist()[k])hist()[k]=Lc[k];
+ const Lc=JSON.parse(localStorage.getItem('pj_hist')||'{}');for(const k in Lc)if(!hist()[k])hist()[k]=Lc[k];normIds();
  const n=new Date();n.setMonth(n.getMonth()+1,1);MES=iso(n).slice(0,7);
  const ks=Object.keys(hist()).sort();
  if(!hist()[MES]&&!AUTH&&ks.length)MES=ks[ks.length-1];
