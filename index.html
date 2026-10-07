@@ -1,5 +1,13 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="utf-8"><title>Predicación · Congregación Curauma</title></head><body>
+<html lang="es"><head><meta charset="utf-8"><title>Predicación · Congregación Curauma</title>
+<style>
+dialog.wide{width:min(560px,calc(100% - 32px));max-height:90vh;overflow:auto}
+.field select{width:100%;background:var(--fill)}
+.field .fl{margin:0}
+.err{color:var(--bad);font-size:12.5px;font-weight:600;margin:10px 0 0}
+.panel-head{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.panel-head .sub{margin:0;flex:1 1 260px}
+</style></head><body>
 <iframe class="map" title="Mapa de territorios" loading="lazy" allowfullscreen
  src="https://www.google.com/maps/d/embed?mid=1H8j2hSNLHMMxyiIiBI___XOZpPDxobc&ll=-33.1185198147293%2C-71.5801330577226&z=16"></iframe>
 <main>
@@ -24,14 +32,7 @@
 </div>
 
 <section class="card noprint" id="ph" hidden><span class="eyebrow">Edición</span><h2>Hermanos</h2>
- <p class="sub">Añade hermanos y elige los días y el turno (mañana, tarde o ambos) en que sacan grupo.</p>
- <form id="fh">
-  <input name="nombre" placeholder="Nombre" required>
-  <input name="tarea" placeholder="Tarea (AN, SM, PTJ…)" size="14">
-  <label class="chk"><input type="checkbox" name="grupo" checked>Puede sacar grupo</label>
-  <select name="turno" aria-label="Turno"><option value="MT">Mañana y tarde</option><option value="M">Solo mañana</option><option value="T">Solo tarde</option></select>
-  <span id="fhd"></span><button class="pri">Añadir</button>
- </form>
+ <div class="panel-head"><p class="sub">Registra hermanos con su rango, grupo, días y turno (mañana, tarde o ambos).</p><button id="addH" class="pri" type="button">+ Añadir hermano</button></div>
  <div class="controls">
   <input type="search" id="eq_hermanos" placeholder="Buscar hermano en la lista…" aria-label="Buscar hermano en la lista">
   <select id="ef_hermanos" aria-label="Filtrar lista"><option value="">Todos</option><option value="si">Sacan grupo</option><option value="no">No sacan grupo</option></select>
@@ -43,14 +44,7 @@
 </section>
 
 <section class="card noprint" id="pc" hidden><span class="eyebrow">Edición</span><h2>Casas</h2>
- <p class="sub">Añade casas y elige los días y el turno (mañana, tarde o ambos) en que pueden recibir el grupo. El generador respeta estas opciones.</p>
- <form id="fc">
-  <input name="nombre" placeholder="Familia (ej. Fam. Cabezas)" required>
-  <input name="dir" placeholder="Dirección" required>
-  <input name="terr" placeholder="Territorio" size="8">
-  <select name="turno" aria-label="Turno"><option value="MT">Mañana y tarde</option><option value="M">Solo mañana</option><option value="T">Solo tarde</option></select>
-  <span id="fcdd"></span><button class="pri">Añadir</button>
- </form>
+ <div class="panel-head"><p class="sub">Registra casas con su dirección, territorios, días y turno. El generador respeta estas opciones.</p><button id="addC" class="pri" type="button">+ Añadir casa</button></div>
  <div class="controls">
   <input type="search" id="eq_casas" placeholder="Buscar casa en la lista…" aria-label="Buscar casa en la lista">
   <select id="ef_casas" aria-label="Filtrar lista"><option value="">Todas</option><option value="si">Activas</option><option value="no">En pausa</option></select>
@@ -61,6 +55,8 @@
  <div class="pagination" id="pg_casas"><span class="pg-info" id="pi_casas"></span><span class="pg-btns"><button class="ghost small" type="button" data-pp="casas:-1" id="pp_casas">‹ Anterior</button><button class="ghost small" type="button" data-pp="casas:1" id="pn_casas">Siguiente ›</button></span></div>
 </section>
 </main>
+
+<dialog id="dlgE" class="wide" aria-label="Añadir o editar"></dialog>
 
 <div class="edit-bar noprint" id="editBar" hidden role="toolbar" aria-label="Edición">
  <button id="editModeBtn" type="button" aria-pressed="false">✏️ Edición: off</button>
@@ -75,8 +71,6 @@ let AUTH=false,EM=false,fd=new Date().getDay(),fv=fd,ft='',fr='',fvt='',fgp='si'
 const ES={hermanos:{q:'',f:'si',size:10,page:1},casas:{q:'',f:'',size:10,page:1}};
 const ORD={AN:0,SM:1,PRE:2,PUB:3};
 const uid=()=>Math.random().toString(36).slice(2,9);
-const boxes=n=>ORDEN.map(d=>`<label class=chk><input type=checkbox name=d value=${d} ${d>0?'checked':''}>${DIAS[d].slice(0,3)}</label>`).join('');
-$('#fhd').innerHTML=boxes();$('#fcdd').innerHTML=boxes();
 
 const RG={AN:'Anciano',SM:'Siervo ministerial',PR:'Precursor regular',PE:'Precursor especial',PA:'Precursor auxiliar',PTJ:'Publicador',SC:'Superintendente de circuito'};
 const rango=t=>esc((t||'').split('/').map(x=>RG[x.trim()]||x.trim()).filter(Boolean).join(' · ')||'Publicador');
@@ -120,7 +114,7 @@ function erow(k,x){
  <td class=dy data-label="Días">${g?`<div class=tj>`+ORDEN.map(d=>`<span class="chip ${x.dias.includes(d)?'on':''}" data-d=${d} role=button tabindex=0 title="${DIAS[d]}">${DIAS[d].slice(0,2)}</span>`).join('')+`</div>`:'<span class=mut>No saca grupo</span>'}</td>
  <td data-label="Turno">${g?turnoBtns(x.turno):'<span class=mut>—</span>'}</td>
  <td data-label="${h?'Disponible':'Activa'}"><label class=sw><input type=checkbox data-a aria-label="${h?'Disponible':'Activa'}" ${off?'':'checked'}><i></i></label></td>
- <td data-label=""><button class="danger small" data-del title="Eliminar" aria-label="Eliminar ${esc(x.nombre)}">✕</button></td></tr>`;
+ <td data-label=""><div class=tj><button class="small" data-edit title="Editar" aria-label="Editar ${esc(x.nombre)}">✎ Editar</button><button class="danger small" data-del title="Eliminar" aria-label="Eliminar ${esc(x.nombre)}">✕</button></div></td></tr>`;
 }
 function elist(k){
  const h=k=='hermanos',S=ES[k],q=S.q.trim().toLowerCase();
@@ -144,18 +138,13 @@ function render(){
  elist('hermanos');elist('casas');
 }
 function dirty(){$('#saveBtn').disabled=false;$('#st').className='save-status';$('#st').textContent='Cambios sin guardar';}
-function add(e,k){
- e.preventDefault();const f=new FormData(e.target),h=k=='hermanos',g=h&&!!f.get('grupo');
- DB[k].push({id:uid(),nombre:f.get('nombre'),turno:f.get('turno'),dias:(!h||g)?f.getAll('d').map(Number):[],activa:true,...(h?{tarea:f.get('tarea')||'',gr:'',grupo:g}:{dir:f.get('dir')||'',terr:f.get('terr')||''})});
- e.target.reset();render();dirty();toast((f.get('nombre')||'Registro')+' añadido ✓','ok');
-}
-$('#fc').onsubmit=e=>add(e,'casas');$('#fh').onsubmit=e=>add(e,'hermanos');
 const find=el=>{const it=el.closest?.('.erow');return it&&[DB[it.dataset.k],DB[it.dataset.k].find(x=>x.id==it.dataset.id)];};
 document.addEventListener('click',e=>{
  const ds=e.target.dataset||{};
  if('fd' in ds){fd=+ds.fd;return cards();}if('fv' in ds){fv=+ds.fv;return cards();}if('ft' in ds){ft=ds.ft;return cards();}if('fvt' in ds){fvt=ds.fvt;return cards();}if('fr' in ds){fr=ds.fr;return cards();}if('fg' in ds){fgp=ds.fg;return cards();}
  if('pp' in ds){const[k,d]=ds.pp.split(':');ES[k].page+=+d;return elist(k);}
  const r=find(e.target);if(!r||!AUTH)return;const [arr,x]=r;
+ if(ds.edit!==undefined){openM(e.target.closest('.erow').dataset.k,x);return;}
  if(ds.d!==undefined){const d=+ds.d;x.dias=x.dias.includes(d)?x.dias.filter(v=>v!=d):[...x.dias,d];render();dirty();}
  if(ds.tn!==undefined){
   const cur=x.turno||'MT',has={M:turnoOk(cur,'M'),T:turnoOk(cur,'T')};has[ds.tn]=!has[ds.tn];
@@ -172,6 +161,74 @@ document.addEventListener('change',e=>{
  if('a' in ds)x.activa=e.target.checked;
  render();dirty();
 });
+/* ---------- Tarjeta para añadir / editar ---------- */
+let M=null;
+const RANKS=[['AN','Anciano'],['SM','Siervo ministerial'],['PR','Precursor regular'],['PE','Precursor especial'],['PA','Precursor auxiliar'],['SC','Superintendente de circuito'],['PTJ','Publicador']];
+const PRE3=['PR','PE','PA'];
+const mChip=(a,v,l,on)=>`<span class="chip ${on?'on':''}" data-${a}="${v}" role=button tabindex=0 aria-pressed=${on}>${l}</span>`;
+function openM(k,x){
+ const h=k=='hermanos',t=x?.turno||'MT';
+ M={k,x:x||null,dias:new Set(x?x.dias:ORDEN),turno:{M:turnoOk(t,'M'),T:turnoOk(t,'T')},rank:new Set(x?(x.tarea||'').split('/').map(s=>s.trim().toUpperCase()).filter(Boolean):['PTJ'])};
+ if(!M.rank.size)M.rank.add('PTJ');
+ const grupo=x?!!x.grupo:true,terrs=(x?.cerca?.length?x.cerca:[x?.terr].filter(Boolean)).join(', ');
+ const sched=`<div id=m_sched ${h&&!grupo?'hidden':''}><div class=field><label>Días ${h?'en que saca grupo':'disponibles'}</label><div class=fl>${ORDEN.map(d=>mChip('md',d,DIAS[d].slice(0,3),M.dias.has(d))).join('')}</div></div>
+  <div class=field><label>Turno</label><div class=fl>${mChip('mt','M','☀ Mañana',M.turno.M)}${mChip('mt','T','🌙 Tarde',M.turno.T)}</div><p class=hint style="margin:4px 0 0">Enciende los dos para mañana y tarde.</p></div></div>`;
+ $('#dlgE').innerHTML=`<h3>${x?'Editar':'Añadir'} ${h?'hermano':'casa'}</h3>
+ <div class=field><label for=m_nombre>${h?'Nombre':'Familia / dueño de la casa'}</label><input type=text id=m_nombre value="${esc(x?.nombre||'')}" placeholder="${h?'Nombre y apellido':'Fam. Apellido'}" autocomplete=off></div>
+ ${h?`<div class=field><label>Rango</label><div class=fl id=m_rank>${RANKS.map(([c,l])=>mChip('mr',c,l,M.rank.has(c))).join('')}</div></div>
+ <div class=field-row><div class=field><label for=m_gr>Grupo de predicación</label><select id=m_gr><option value="">—</option>${[1,2,3,4,5].map(n=>`<option value=${n} ${x?.gr==n?'selected':''}>Grupo ${n}</option>`).join('')}</select></div>
+ <div class=field><label>Salidas</label><label class=chk style="margin-top:8px"><input type=checkbox id=m_grupo ${grupo?'checked':''}>Puede sacar grupo</label></div></div>`
+ :`<div class=field><label for=m_dir>Dirección</label><input type=text id=m_dir value="${esc(x?.dir||'')}" placeholder="Calle y número" autocomplete=off></div>
+ <div class=field><label for=m_terr>Territorios disponibles para esta casa</label><input type=text id=m_terr value="${esc(terrs)}" placeholder="Ej. 13, 12, 15" autocomplete=off><p class=hint style="margin:4px 0 0">Separados por coma. El primero es el principal; el generador reparte entre todos.</p></div>`}
+ ${sched}
+ <label class=chk style="margin-top:4px"><input type=checkbox id=m_act ${x?.activa===false?'':'checked'}>${h?'Hermano disponible':'Casa activa (el programa la puede usar)'}</label>
+ <p class=err id=m_err hidden role=alert></p>
+ <div class=modal-actions><span class=sp></span><button class=ghost type=button data-mx=cancel>Cancelar</button><button class=pri type=button data-mx=save>Guardar</button></div>`;
+ $('#dlgE').showModal();$('#m_nombre').focus();
+}
+function saveM(){
+ const {k,x}=M,h=k=='hermanos',err=m=>{$('#m_err').textContent=m;$('#m_err').hidden=false;};
+ const nombre=$('#m_nombre').value.trim();
+ if(nombre.length<2)return err(h?'Escribe el nombre del hermano.':'Escribe de quién es la casa.');
+ const grupo=h?$('#m_grupo').checked:true,needS=!h||grupo;
+ if(needS){if(!M.dias.size)return err('Elige al menos un día.');if(!M.turno.M&&!M.turno.T)return err('Elige mañana, tarde o ambos.');}
+ const turno=M.turno.M&&M.turno.T?'MT':M.turno.M?'M':M.turno.T?'T':'MT',dias=needS?ORDEN.filter(d=>M.dias.has(d)):[],activa=$('#m_act').checked;
+ let o;
+ if(h){const ord=['AN','SM','PR','PE','PA','SC','PTJ'];o={nombre,tarea:ord.filter(c=>M.rank.has(c)).join('/')||'PTJ',gr:$('#m_gr').value,grupo,turno,dias,activa};}
+ else{
+  const dir=$('#m_dir').value.trim();if(!dir)return err('Escribe la dirección.');
+  const L=[...new Set($('#m_terr').value.split(/[,;\s]+/).map(s=>s.trim()).filter(Boolean))];
+  if(!L.length)return err('Escribe al menos un territorio.');
+  o={nombre,dir,terr:L[0],cerca:L.map(v=>isNaN(v)?v:Number(v)),turno,dias,activa};
+ }
+ if(x)Object.assign(x,o);else DB[k].push({id:uid(),...o});
+ $('#dlgE').close();
+ ES[k].q='';$('#eq_'+k).value='';
+ if(ES[k].f&&((ES[k].f=='si')!=(h?grupo:activa))){ES[k].f='';$('#ef_'+k).value='';}
+ render();dirty();toast(nombre+(x?' actualizado':' añadido')+' ✓','ok');
+ $('#saveBtn').click();
+}
+$('#dlgE').addEventListener('click',e=>{
+ if(e.target==$('#dlgE'))return $('#dlgE').close();
+ const ds=e.target.dataset||{};if(!M)return;
+ const tog=(el,on)=>{el.classList.toggle('on',on);el.setAttribute('aria-pressed',on);};
+ if(ds.md!==undefined){const d=+ds.md,on=!M.dias.has(d);on?M.dias.add(d):M.dias.delete(d);tog(e.target,on);}
+ if(ds.mt!==undefined){M.turno[ds.mt]=!M.turno[ds.mt];tog(e.target,M.turno[ds.mt]);}
+ if(ds.mr!==undefined){const c=ds.mr;
+  if(c=='PTJ')M.rank=new Set(['PTJ']);
+  else{M.rank.delete('PTJ');if(M.rank.has(c))M.rank.delete(c);else{if(PRE3.includes(c))PRE3.forEach(p=>M.rank.delete(p));M.rank.add(c);}}
+  if(!M.rank.size)M.rank.add('PTJ');
+  document.querySelectorAll('#m_rank .chip').forEach(el=>tog(el,M.rank.has(el.dataset.mr)));}
+ if(ds.mx=='cancel')$('#dlgE').close();
+ if(ds.mx=='save')saveM();
+});
+$('#dlgE').addEventListener('change',e=>{
+ if(e.target.id!='m_grupo')return;
+ $('#m_sched').hidden=!e.target.checked;
+ if(e.target.checked&&!M.dias.size){M.dias=new Set(ORDEN);document.querySelectorAll('#m_sched [data-md]').forEach(el=>el.classList.add('on'));}
+});
+$('#dlgE').addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.tagName=='INPUT'&&e.target.type=='text'){e.preventDefault();saveM();}});
+$('#addH').onclick=()=>openM('hermanos');$('#addC').onclick=()=>openM('casas');
 $('#q1').oninput=e=>{q1=e.target.value;cards();};$('#q2').oninput=e=>{q2=e.target.value;cards();};
 $('#editModeBtn').onclick=()=>{
  EM=!EM;
