@@ -430,10 +430,11 @@
       "nombre": "Jorge Benavides",
       "tarea": "AN",
       "gr": "3",
-      "turno": "M",
+      "turno": "MT",
       "grupo": true,
       "dias": [
-        0
+        0,
+        3
       ],
       "activa": true
     },
