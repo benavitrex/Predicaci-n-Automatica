@@ -415,7 +415,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        5
+        5,
+        1
       ],
       "activa": true
     },
@@ -462,7 +463,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        5
+        5,
+        2
       ],
       "activa": true
     },
@@ -543,7 +545,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        1
+        1,
+        4
       ],
       "activa": true
     },
@@ -647,7 +650,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        4
+        4,
+        1
       ],
       "activa": true
     },
@@ -672,7 +676,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        2
+        2,
+        5
       ],
       "activa": true
     },
@@ -723,16 +728,11 @@
       "nombre": "Andrés Valenzuela",
       "tarea": "PTJ",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
         3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -766,7 +766,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        3
+        3,
+        5
       ],
       "activa": true
     },
@@ -799,16 +800,6 @@
       "grupo": false,
       "dias": [],
       "activa": true
-    },
-    {
-      "id": "h115",
-      "nombre": "Yimmy Silva",
-      "tarea": "",
-      "gr": "",
-      "turno": "MT",
-      "grupo": false,
-      "dias": [],
-      "activa": false
     },
     {
       "id": "h116",
