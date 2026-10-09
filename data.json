@@ -412,8 +412,8 @@
       "turno": "M",
       "grupo": true,
       "dias": [
-        5,
-        2
+        2,
+        4
       ],
       "activa": true
     },
