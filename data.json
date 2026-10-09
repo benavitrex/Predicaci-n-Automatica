@@ -10,15 +10,10 @@
         12,
         15
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
         1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true,
       "gr": "1"
@@ -33,14 +28,9 @@
         18,
         20
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
         3,
-        4,
-        5,
-        6,
         0
       ],
       "activa": true,
@@ -57,14 +47,9 @@
         5,
         6
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
         2,
-        3,
-        4,
-        5,
-        6,
         0
       ],
       "activa": true,
@@ -80,15 +65,9 @@
         5,
         16
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true,
       "gr": "1"
@@ -102,15 +81,10 @@
         2,
         3
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
         1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true,
       "gr": "2"
@@ -127,7 +101,8 @@
       ],
       "turno": "M",
       "dias": [
-        3
+        3,
+        6
       ],
       "activa": true,
       "gr": "5"
@@ -143,15 +118,10 @@
         4,
         21
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
         3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true,
       "gr": "4"
@@ -165,14 +135,9 @@
         14,
         15
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
         3,
-        4,
-        5,
-        6,
         0
       ],
       "activa": true,
@@ -187,15 +152,10 @@
         3,
         2
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
         3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true,
       "gr": "5"
@@ -211,15 +171,10 @@
         9,
         10
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        0,
+        4
       ],
       "activa": true,
       "gr": "3"
@@ -234,15 +189,10 @@
         21,
         20
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
         1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true,
       "gr": "1"
@@ -256,15 +206,10 @@
         11,
         10
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
         2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true,
       "gr": ""
@@ -279,15 +224,10 @@
         21,
         1
       ],
-      "turno": "MT",
+      "turno": "M",
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
         6,
-        0
+        4
       ],
       "activa": true,
       "gr": "1"
@@ -307,11 +247,15 @@
       "id": "c14",
       "nombre": "Fam. Núñez",
       "dir": "Los Maitenes 127",
-      "terr": "",
-      "cerca": [],
-      "turno": "MT",
-      "dias": [],
-      "activa": false,
+      "terr": "13",
+      "cerca": [
+        13
+      ],
+      "turno": "M",
+      "dias": [
+        6
+      ],
+      "activa": true,
       "gr": ""
     },
     {
