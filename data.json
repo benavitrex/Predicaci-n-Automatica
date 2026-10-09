@@ -412,16 +412,10 @@
       "nombre": "Juan Aguilera",
       "tarea": "AN/PR",
       "gr": "1",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -498,16 +492,10 @@
       "nombre": "Mario Aliaga",
       "tarea": "AN",
       "gr": "2",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -552,7 +540,7 @@
       "nombre": "Hernán Coronado",
       "tarea": "AN",
       "gr": "3",
-      "turno": "M",
+      "turno": "T",
       "grupo": true,
       "dias": [
         3
@@ -574,16 +562,10 @@
       "nombre": "Claudio Correa",
       "tarea": "AN/PE",
       "gr": "5",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        1
       ],
       "activa": true
     },
@@ -656,15 +638,9 @@
       "nombre": "Manuel Hernández",
       "tarea": "AN",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
         0
       ],
       "activa": true
@@ -692,16 +668,10 @@
       "nombre": "Luis López",
       "tarea": "AN",
       "gr": "2",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -720,16 +690,10 @@
       "nombre": "Ronny Pérez",
       "tarea": "AN/PR",
       "gr": "5",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        4
       ],
       "activa": true
     },
@@ -756,16 +720,10 @@
       "nombre": "Cristian Da Silva",
       "tarea": "AN/PR",
       "gr": "1",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        2
       ],
       "activa": true
     },
@@ -774,16 +732,10 @@
       "nombre": "Luis Escandell",
       "tarea": "AN",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -860,16 +812,10 @@
       "nombre": "Felipe Gonzalez",
       "tarea": "AN/PR",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        3
       ],
       "activa": true
     },
@@ -907,16 +853,8 @@
       "tarea": "SM/PR",
       "gr": "",
       "turno": "MT",
-      "grupo": true,
-      "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
-      ],
+      "grupo": false,
+      "dias": [],
       "activa": true
     },
     {
