@@ -436,16 +436,11 @@
       "nombre": "Luis Cabezas",
       "tarea": "PTJ",
       "gr": "1",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
         1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        3
       ],
       "activa": true
     },
@@ -464,16 +459,10 @@
       "nombre": "Ismael Orellana",
       "tarea": "SM/PR",
       "gr": "1",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -504,16 +493,10 @@
       "nombre": "Carlos Alvarado",
       "tarea": "PTJ",
       "gr": "5",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -522,15 +505,11 @@
       "nombre": "David Cruz",
       "tarea": "SM/PR",
       "gr": "2",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
         2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -573,16 +552,10 @@
       "nombre": "Miguel Meneses",
       "tarea": "SM",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        4
       ],
       "activa": true
     },
@@ -591,16 +564,10 @@
       "nombre": "Johnny Silva",
       "tarea": "SM",
       "gr": "3",
-      "turno": "MT",
+      "turno": "T",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -609,16 +576,10 @@
       "nombre": "Ricardo Ugalde",
       "tarea": "SM",
       "gr": "3",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -649,16 +610,10 @@
       "nombre": "Felipe Godoy",
       "tarea": "SM",
       "gr": "4",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
-        2,
-        3,
-        4,
-        5,
-        6,
-        0
+        6
       ],
       "activa": true
     },
@@ -701,16 +656,11 @@
       "nombre": "Guillermo Colina",
       "tarea": "SM",
       "gr": "2",
-      "turno": "MT",
+      "turno": "M",
       "grupo": true,
       "dias": [
-        1,
         2,
-        3,
-        4,
-        5,
-        6,
-        0
+        5
       ],
       "activa": true
     },
@@ -774,16 +724,6 @@
       "tarea": "PTJ",
       "gr": "4",
       "turno": "MT",
-      "grupo": false,
-      "dias": [],
-      "activa": true
-    },
-    {
-      "id": "h99",
-      "nombre": "Mauricio Valenzuela",
-      "tarea": "SM",
-      "gr": "5",
-      "turno": "MT",
       "grupo": true,
       "dias": [
         1,
@@ -792,6 +732,18 @@
         4,
         5,
         6,
+        0
+      ],
+      "activa": true
+    },
+    {
+      "id": "h99",
+      "nombre": "Mauricio Valenzuela",
+      "tarea": "SM",
+      "gr": "5",
+      "turno": "M",
+      "grupo": true,
+      "dias": [
         0
       ],
       "activa": true
