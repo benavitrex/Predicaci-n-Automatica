@@ -262,11 +262,16 @@
       "id": "c15",
       "nombre": "Fam. Hernández",
       "dir": "Las Valerianas 1172",
-      "terr": "",
-      "cerca": [],
-      "turno": "MT",
-      "dias": [],
-      "activa": false,
+      "terr": "12",
+      "cerca": [
+        12
+      ],
+      "turno": "M",
+      "dias": [
+        1,
+        6
+      ],
+      "activa": true,
       "gr": ""
     }
   ],
